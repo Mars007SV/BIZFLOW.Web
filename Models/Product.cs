@@ -7,7 +7,7 @@ namespace BIZFLOW.Web.Models
         public int Id { get; set; } // Primary key
 
         [Required]
-        public string Name { get; set; } // Product name
+        public string Name { get; set; } = string.Empty; // Product name
 
         [Required]
         public int Quantity { get; set; } // Current quantity in stock
