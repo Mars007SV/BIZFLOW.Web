@@ -1,0 +1,82 @@
+@model IEnumerable<BIZFLOW.Web.Models.Operation>
+
+@{
+    ViewData["Title"] = "Історія операцій";
+}
+
+<h1>Історія операцій: @ViewData["ProductName"]</h1>
+
+<div class="alert alert-info">
+    <strong>Поточна кількість на складі:</strong> @ViewData["CurrentQuantity"] одиниць
+</div>
+
+<p>
+    <a asp-action="Index" class="btn btn-secondary">Повернутися до всіх операцій</a>
+    <a asp-controller="Products" asp-action="Details" asp-route-id="@(Model.FirstOrDefault()?.ProductId)" class="btn btn-info">Деталі продукту</a>
+</p>
+
+@if (Model.Any())
+{
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th>Дата та час</th>
+                    <th>Тип операції</th>
+                    <th>Кількість</th>
+                    <th>Залишок після операції</th>
+                    <th>Опис</th>
+                    <th>Користувач</th>
+                    <th>Дії</th>
+                </tr>
+            </thead>
+            <tbody>
+        @foreach (var item in Model) {
+                <tr>
+                    <td>
+                        @item.Date.ToString("dd.MM.yyyy HH:mm")
+                    </td>
+                    <td>
+                        @if (item.Type == "Incoming")
+                        {
+                            <span class="badge bg-success">Надходження</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger">Списання</span>
+                        }
+                    </td>
+                    <td>
+                        @if (item.Type == "Incoming")
+                        {
+                            <span class="text-success"><strong>+@item.Quantity</strong></span>
+                        }
+                        else
+                        {
+                            <span class="text-danger"><strong>-@item.Quantity</strong></span>
+                        }
+                    </td>
+                    <td>
+                        <strong>@item.RemainingQuantity</strong>
+                    </td>
+                    <td>
+                        @(string.IsNullOrEmpty(item.Description) ? "-" : item.Description)
+                    </td>
+                    <td>
+                        @(string.IsNullOrEmpty(item.UserName) ? "-" : item.UserName)
+                    </td>
+                    <td>
+                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">Деталі</a>
+                    </td>
+                </tr>
+        }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <div class="alert alert-warning" role="alert">
+        Для цього продукту ще немає операцій.
+    </div>
+}

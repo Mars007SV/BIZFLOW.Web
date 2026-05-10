@@ -20,10 +20,53 @@ namespace BIZFLOW.Web.Controllers
         }
 
         // GET: Operations
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string sortOrder, string searchString, string operationType, DateTime? startDate, DateTime? endDate)
         {
-            var bizFlowDbContext = _context.Operations.Include(o => o.Product);
-            return View(await bizFlowDbContext.ToListAsync());
+            ViewData["DateSortParm"] = String.IsNullOrEmpty(sortOrder) ? "date_desc" : "";
+            ViewData["ProductSortParm"] = sortOrder == "Product" ? "product_desc" : "Product";
+            ViewData["TypeSortParm"] = sortOrder == "Type" ? "type_desc" : "Type";
+            ViewData["CurrentFilter"] = searchString;
+            ViewData["CurrentType"] = operationType;
+            ViewData["StartDate"] = startDate;
+            ViewData["EndDate"] = endDate;
+
+            var operations = _context.Operations.Include(o => o.Product).AsQueryable();
+
+            // Search filter
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                operations = operations.Where(o => o.Product!.Name.Contains(searchString) 
+                    || (o.Description != null && o.Description.Contains(searchString)));
+            }
+
+            // Type filter
+            if (!String.IsNullOrEmpty(operationType))
+            {
+                operations = operations.Where(o => o.Type == operationType);
+            }
+
+            // Date range filter
+            if (startDate.HasValue)
+            {
+                operations = operations.Where(o => o.Date >= startDate.Value);
+            }
+            if (endDate.HasValue)
+            {
+                operations = operations.Where(o => o.Date <= endDate.Value);
+            }
+
+            // Sorting
+            operations = sortOrder switch
+            {
+                "date_desc" => operations.OrderByDescending(o => o.Date),
+                "Product" => operations.OrderBy(o => o.Product!.Name),
+                "product_desc" => operations.OrderByDescending(o => o.Product!.Name),
+                "Type" => operations.OrderBy(o => o.Type),
+                "type_desc" => operations.OrderByDescending(o => o.Type),
+                _ => operations.OrderBy(o => o.Date),
+            };
+
+            return View(await operations.ToListAsync());
         }
 
         // GET: Operations/Details/5
@@ -57,7 +100,7 @@ namespace BIZFLOW.Web.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,ProductId,Quantity,Type,Date")] Operation operation)
+        public async Task<IActionResult> Create([Bind("Id,ProductId,Quantity,Type,Date,Description")] Operation operation)
         {
             if (ModelState.IsValid)
             {
@@ -66,6 +109,9 @@ namespace BIZFLOW.Web.Controllers
                 {
                     operation.Date = DateTime.Now;
                 }
+
+                // Set current user (if you have authentication, use User.Identity.Name)
+                operation.UserName = User?.Identity?.Name ?? "Система";
 
                 // find the product
                 var product = await _context.Products.FindAsync(operation.ProductId);
@@ -92,10 +138,14 @@ namespace BIZFLOW.Web.Controllers
                     product.Quantity -= operation.Quantity;
                 }
 
+                // Save remaining quantity after operation
+                operation.RemainingQuantity = product.Quantity;
+
                 // we keep
                 _context.Add(operation);
                 await _context.SaveChangesAsync();
 
+                TempData["SuccessMessage"] = $"Операцію успішно створено. Поточний залишок: {product.Quantity}";
                 return RedirectToAction(nameof(Index));
             }
 
@@ -193,6 +243,32 @@ namespace BIZFLOW.Web.Controllers
         private bool OperationExists(int id)
         {
             return _context.Operations.Any(e => e.Id == id);
+        }
+
+        // GET: Operations/ProductHistory/5
+        public async Task<IActionResult> ProductHistory(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var product = await _context.Products.FindAsync(id);
+            if (product == null)
+            {
+                return NotFound();
+            }
+
+            ViewData["ProductName"] = product.Name;
+            ViewData["CurrentQuantity"] = product.Quantity;
+
+            var operations = await _context.Operations
+                .Include(o => o.Product)
+                .Where(o => o.ProductId == id)
+                .OrderByDescending(o => o.Date)
+                .ToListAsync();
+
+            return View(operations);
         }
     }
 }
