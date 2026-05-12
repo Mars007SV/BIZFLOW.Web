@@ -1,0 +1,44 @@
+@model BIZFLOW.Web.Models.User
+
+@{
+    ViewData["Title"] = "Профіль користувача";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Профіль користувача</h2>
+                </div>
+                <div class="card-body">
+                    <form asp-action="UpdateProfile" method="post">
+                        <div class="mb-3">
+                            <label for="userName" class="form-label">Ім'я користувача</label>
+                            <input type="text" class="form-control" id="userName" name="userName" value="@Model.UserName" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">ID пристрою</label>
+                            <input type="text" class="form-control" value="@Model.DeviceId" readonly />
+                            <small class="form-text text-muted">Унікальний ідентифікатор вашого ПК</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Дата реєстрації</label>
+                            <input type="text" class="form-control" value="@Model.CreatedAt.ToString("dd.MM.yyyy HH:mm")" readonly />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Останній вхід</label>
+                            <input type="text" class="form-control" value="@Model.LastAccessAt.ToString("dd.MM.yyyy HH:mm")" readonly />
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Зберегти зміни</button>
+                        <a asp-action="Index" asp-controller="Home" class="btn btn-secondary">Повернутися</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

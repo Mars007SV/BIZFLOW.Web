@@ -1,4 +1,6 @@
 using BIZFLOW.Web.Data;
+using BIZFLOW.Web.Middleware;
+using BIZFLOW.Web.Services;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
@@ -11,6 +13,9 @@ builder.WebHost.UseUrls("http://localhost:5555");
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
+// Реєстрація UserService
+builder.Services.AddScoped<IUserService, UserService>();
+
 builder.Services.AddDbContext<BizFlowDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
@@ -22,6 +27,10 @@ app.UseHsts();
 
 app.UseStaticFiles();
 app.UseRouting();
+
+// Middleware для автоматичного створення користувача
+app.UseUserInitialization();
+
 app.UseAuthorization();
 
 app.MapStaticAssets();

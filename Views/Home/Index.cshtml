@@ -2,6 +2,15 @@
     ViewData["Title"] = "Головна";
 }
 
+@if (!string.IsNullOrEmpty(ViewBag.UserName))
+{
+    <div class="alert alert-info alert-dismissible fade show" role="alert">
+        <strong>Вітаємо, @ViewBag.UserName!</strong> Ви увійшли в систему BIZFLOW.
+        <a asp-controller="User" asp-action="Profile" class="alert-link">Переглянути профіль</a>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
 <div class="hero-section">
     <div class="text-center py-5">
         <h1 class="display-3 fw-bold text-primary mb-3">BIZFLOW</h1>

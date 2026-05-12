@@ -1,0 +1,43 @@
+@model IEnumerable<BIZFLOW.Web.Models.User>
+
+@{
+    ViewData["Title"] = "Список користувачів";
+}
+
+<div class="container mt-4">
+    <h2>Список користувачів</h2>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Ім'я</th>
+                <th>ID пристрою</th>
+                <th>Створено</th>
+                <th>Останній вхід</th>
+                <th>Дії</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in Model)
+            {
+                <tr>
+                    <td>@user.Id</td>
+                    <td>@user.UserName</td>
+                    <td>@user.DeviceId.Substring(0, Math.Min(16, user.DeviceId.Length))...</td>
+                    <td>@user.CreatedAt.ToString("dd.MM.yyyy HH:mm")</td>
+                    <td>@user.LastAccessAt.ToString("dd.MM.yyyy HH:mm")</td>
+                    <td>
+                        <span class="badge bg-info">
+                            @((DateTime.Now - user.LastAccessAt).TotalMinutes < 5 ? "Активний" : "Неактивний")
+                        </span>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <div class="alert alert-info">
+        <strong>Всього користувачів:</strong> @Model.Count()
+    </div>
+</div>
