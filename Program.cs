@@ -13,8 +13,17 @@ builder.WebHost.UseUrls("http://localhost:5555");
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-// Реєстрація UserService
-builder.Services.AddScoped<IUserService, UserService>();
+// Додаємо підтримку сесій
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromHours(24); // Сесія на 24 години
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
+
+// Реєстрація AuthService
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 builder.Services.AddDbContext<BizFlowDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -28,8 +37,11 @@ app.UseHsts();
 app.UseStaticFiles();
 app.UseRouting();
 
-// Middleware для автоматичного створення користувача
-app.UseUserInitialization();
+// Додаємо сесії
+app.UseSession();
+
+// Middleware для перевірки авторизації
+app.UseAuthenticationMiddleware();
 
 app.UseAuthorization();
 

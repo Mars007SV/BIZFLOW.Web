@@ -1,4 +1,5 @@
 using BIZFLOW.Web.Data;
+using BIZFLOW.Web.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,44 +8,34 @@ namespace BIZFLOW.Web.Controllers
     public class UserController : Controller
     {
         private readonly BizFlowDbContext _context;
+        private readonly IAuthService _authService;
 
-        public UserController(BizFlowDbContext context)
+        public UserController(BizFlowDbContext context, IAuthService authService)
         {
             _context = context;
+            _authService = authService;
         }
 
         // Показуємо інформацію про поточного користувача
         public async Task<IActionResult> Profile()
         {
-            var deviceId = Request.Cookies["DeviceId"];
-            if (string.IsNullOrEmpty(deviceId))
-            {
-                return RedirectToAction("Index", "Home");
-            }
-
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.DeviceId == deviceId);
+            var user = await _authService.GetCurrentUserAsync(HttpContext);
             if (user == null)
             {
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("Login", "Account");
             }
 
             return View(user);
         }
 
-        // Оновлюємо ім'я користувача
+        // Оновлюємо інформацію користувача
         [HttpPost]
-        public async Task<IActionResult> UpdateProfile(string userName)
+        public async Task<IActionResult> UpdateProfile(string fullName)
         {
-            var deviceId = Request.Cookies["DeviceId"];
-            if (string.IsNullOrEmpty(deviceId))
-            {
-                return RedirectToAction("Index", "Home");
-            }
-
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.DeviceId == deviceId);
+            var user = await _authService.GetCurrentUserAsync(HttpContext);
             if (user != null)
             {
-                user.UserName = userName;
+                user.FullName = fullName;
                 await _context.SaveChangesAsync();
             }
 
@@ -62,16 +53,10 @@ namespace BIZFLOW.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> GetCurrentUser()
         {
-            var deviceId = Request.Cookies["DeviceId"];
-            if (string.IsNullOrEmpty(deviceId))
-            {
-                return Json(new { success = false, message = "No user found" });
-            }
-
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.DeviceId == deviceId);
+            var user = await _authService.GetCurrentUserAsync(HttpContext);
             if (user == null)
             {
-                return Json(new { success = false, message = "User not found" });
+                return Json(new { success = false, message = "No user found" });
             }
 
             return Json(new
@@ -81,6 +66,7 @@ namespace BIZFLOW.Web.Controllers
                 {
                     user.Id,
                     user.UserName,
+                    user.FullName,
                     user.CreatedAt,
                     user.LastAccessAt
                 }

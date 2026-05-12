@@ -1,20 +1,16 @@
-# Система автоматичного створення користувачів
+# Система автентифікації користувачів
 
 ## Опис
 
-Система автоматично створює унікального користувача для кожного ПК при першому відвідуванні додатку. Дані користувача зберігаються в базі даних SQLite.
+Система вимагає від користувача входу або реєстрації при першому запуску додатку. Дані користувачів зберігаються в базі даних SQLite з безпечним хешуванням паролів.
 
 ## Як це працює
 
-1. **При першому запуску** - middleware перевіряє наявність cookie "DeviceId"
-2. **Генерація унікального ID** - якщо cookie немає, генерується унікальний DeviceId на основі:
-   - User-Agent браузера
-   - IP-адреси
-   - Імені комп'ютера
-   - Імені користувача Windows
-3. **Створення користувача** - новий користувач автоматично додається до БД
-4. **Збереження cookie** - DeviceId зберігається в cookie на 10 років
-5. **Подальші візити** - при наступних відвідуваннях система розпізнає користувача та оновлює час останнього доступу
+1. **При запуску додатку** - middleware перевіряє наявність активної сесії користувача
+2. **Без сесії** - користувач перенаправляється на сторінку входу
+3. **Вхід або реєстрація** - користувач може увійти або створити новий обліковий запис
+4. **Збереження сесії** - після успішного входу створюється сесія на 24 години
+5. **Доступ до системи** - користувач може користуватися всіма функціями BIZFLOW
 
 ## Структура даних користувача
 
@@ -22,22 +18,27 @@
 public class User
 {
     public int Id { get; set; }                    // Унікальний ID в БД
-    public string DeviceId { get; set; }           // Унікальний ID пристрою
-    public string? UserName { get; set; }          // Ім'я користувача (можна редагувати)
+    public string UserName { get; set; }           // Ім'я користувача (унікальне)
+    public string PasswordHash { get; set; }       // Хеш паролю (SHA256)
+    public string? FullName { get; set; }          // Повне ім'я (необов'язково)
     public DateTime CreatedAt { get; set; }        // Дата створення
     public DateTime LastAccessAt { get; set; }     // Останній вхід
+    public bool IsActive { get; set; }             // Активний чи ні
     public string? Preferences { get; set; }       // Додаткові налаштування (JSON)
 }
 ```
 
-## Доступні функції
+## Доступні сторінки
 
-### Для користувача:
+### Публічні (без авторизації):
+- `/Account/Login` - вхід в систему
+- `/Account/Register` - реєстрація нового користувача
+- `/Account/Logout` - вихід з системи
+
+### Захищені (потрібна авторизація):
+- Всі інші сторінки системи
 - `/User/Profile` - перегляд та редагування профілю
-- `/User/GetCurrentUser` - API для отримання даних поточного користувача
-
-### Для адміністратора:
-- `/User/Index` - список всіх користувачів системи
+- `/User/Index` - список всіх користувачів (адміністрування)
 
 ## Використання в коді
 
@@ -46,33 +47,53 @@ public class User
 ```csharp
 public class MyController : Controller
 {
-    private readonly IUserService _userService;
+    private readonly IAuthService _authService;
 
-    public MyController(IUserService userService)
+    public MyController(IAuthService authService)
     {
-        _userService = userService;
+        _authService = authService;
     }
 
     public async Task<IActionResult> MyAction()
     {
-        // Отримати весь об'єкт користувача
-        var user = await _userService.GetCurrentUserAsync(HttpContext);
+        // Отримати поточного користувача
+        var user = await _authService.GetCurrentUserAsync(HttpContext);
 
-        // Або тільки ID
-        var userId = await _userService.GetCurrentUserIdAsync(HttpContext);
+        if (user == null)
+        {
+            return RedirectToAction("Login", "Account");
+        }
+
+        // Використовуємо дані користувача
+        ViewBag.UserName = user.UserName;
 
         return View();
     }
 }
 ```
 
-### Отримання через HttpContext напряму:
+### Реєстрація нового користувача:
 
 ```csharp
-var deviceId = HttpContext.Request.Cookies["DeviceId"];
-if (!string.IsNullOrEmpty(deviceId))
+var result = await _authService.RegisterAsync("username", "password", "Full Name");
+if (result.Success)
 {
-    var user = await _context.Users.FirstOrDefaultAsync(u => u.DeviceId == deviceId);
+    // Реєстрація успішна
+}
+else
+{
+    // Помилка: result.Message
+}
+```
+
+### Вхід користувача:
+
+```csharp
+var user = await _authService.LoginAsync("username", "password");
+if (user != null)
+{
+    // Вхід успішний, зберігаємо в сесії
+    HttpContext.Session.SetString("UserId", user.Id.ToString());
 }
 ```
 
@@ -81,20 +102,37 @@ if (!string.IsNullOrEmpty(deviceId))
 Middleware підключається в `Program.cs`:
 
 ```csharp
-app.UseUserInitialization(); // Додати після UseRouting()
-```
+// Додаємо підтримку сесій
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromHours(24);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
 
-Сервіс реєструється:
+// Реєстрація AuthService
+builder.Services.AddScoped<IAuthService, AuthService>();
 
-```csharp
-builder.Services.AddScoped<IUserService, UserService>();
+// В pipeline додаємо
+app.UseSession();
+app.UseAuthenticationMiddleware();
 ```
 
 ## Безпека
 
-- DeviceId хешується за допомогою SHA256
-- Cookie має HttpOnly прапорець (захист від XSS)
-- Унікальність DeviceId забезпечується індексом в БД
+- **Хешування паролів** - використовується SHA256 для зберігання паролів
+- **Перевірка унікальності** - ім'я користувача має бути унікальним (індекс в БД)
+- **Захист сесій** - HttpOnly cookies для запобігання XSS атакам
+- **Валідація даних** - перевірка всіх вхідних даних через Data Annotations
+- **Мінімальна довжина паролю** - не менше 6 символів
+
+## Вимоги до реєстрації
+
+- **Ім'я користувача**: 3-50 символів, унікальне
+- **Пароль**: мінімум 6 символів
+- **Підтвердження паролю**: має співпадати з паролем
+- **Повне ім'я**: необов'язково, до 100 символів
 
 ## Розширення
 
@@ -105,15 +143,26 @@ user.Preferences = JsonSerializer.Serialize(new
 {
     Theme = "dark",
     Language = "uk",
-    PageSize = 50
+    PageSize = 50,
+    EmailNotifications = true
 });
 ```
 
 ## Міграції
 
-Для створення таблиці користувачів виконано:
+Для створення системи авторизації виконано:
 
 ```bash
-dotnet ef migrations add AddUserTable
+dotnet ef migrations add UpdateUserTableForAuthentication
 dotnet ef database update
 ```
+
+## Функції AuthService
+
+- `LoginAsync(userName, password)` - вхід користувача
+- `RegisterAsync(userName, password, fullName)` - реєстрація
+- `GetCurrentUserAsync(HttpContext)` - отримання поточного користувача
+- `LogoutAsync(HttpContext)` - вихід з системи
+- `HashPassword(password)` - хешування паролю
+- `VerifyPassword(password, hash)` - перевірка паролю
+

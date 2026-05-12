@@ -19,9 +19,9 @@ namespace BIZFLOW.Web.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            // Створюємо унікальний індекс для DeviceId
+            // Створюємо унікальний індекс для UserName
             modelBuilder.Entity<User>()
-                .HasIndex(u => u.DeviceId)
+                .HasIndex(u => u.UserName)
                 .IsUnique();
         }
     }

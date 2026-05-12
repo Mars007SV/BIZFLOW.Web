@@ -8,21 +8,21 @@ namespace BIZFLOW.Web.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-        private readonly IUserService _userService;
+        private readonly IAuthService _authService;
 
-        public HomeController(ILogger<HomeController> logger, IUserService userService)
+        public HomeController(ILogger<HomeController> logger, IAuthService authService)
         {
             _logger = logger;
-            _userService = userService;
+            _authService = authService;
         }
 
         public async Task<IActionResult> Index()
         {
             // Приклад отримання поточного користувача
-            var currentUser = await _userService.GetCurrentUserAsync(HttpContext);
+            var currentUser = await _authService.GetCurrentUserAsync(HttpContext);
             if (currentUser != null)
             {
-                ViewBag.UserName = currentUser.UserName;
+                ViewBag.UserName = currentUser.FullName ?? currentUser.UserName;
                 ViewBag.UserId = currentUser.Id;
             }
 
