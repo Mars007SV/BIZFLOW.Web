@@ -52,6 +52,7 @@ namespace BIZFLOW.Web.Controllers
                         ProductName = o.Product!.Name,
                         OperationType = o.Type,
                         Quantity = o.Quantity,
+                        UnitOfMeasure = o.Product!.UnitOfMeasure,
                         Date = o.Date,
                         UserName = o.UserName
                     })

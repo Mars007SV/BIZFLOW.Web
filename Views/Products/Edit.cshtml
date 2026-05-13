@@ -1,12 +1,11 @@
 ﻿@model BIZFLOW.Web.Models.Product
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Редагувати товар";
 }
 
-<h1>Edit</h1>
+<h1>Редагувати товар</h1>
 
-<h4>Product</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -20,8 +19,13 @@
             </div>
             <div class="form-group">
                 <label asp-for="Quantity" class="control-label"></label>
-                <input asp-for="Quantity" class="form-control" />
+                <input asp-for="Quantity" class="form-control" type="number" step="0.001" />
                 <span asp-validation-for="Quantity" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="UnitOfMeasure" class="control-label"></label>
+                <select asp-for="UnitOfMeasure" class="form-control" asp-items="Html.GetEnumSelectList<BIZFLOW.Web.Models.UnitOfMeasure>()"></select>
+                <span asp-validation-for="UnitOfMeasure" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="CategoryId" class="control-label"></label>
@@ -29,14 +33,14 @@
                 <span asp-validation-for="CategoryId" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
+                <input type="submit" value="Зберегти" class="btn btn-primary" />
             </div>
         </form>
     </div>
 </div>
 
 <div>
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Index">Назад до списку</a>
 </div>
 
 @section Scripts {

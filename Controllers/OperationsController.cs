@@ -145,7 +145,14 @@ namespace BIZFLOW.Web.Controllers
                 _context.Add(operation);
                 await _context.SaveChangesAsync();
 
-                TempData["SuccessMessage"] = $"Операцію успішно створено. Поточний залишок: {product.Quantity}";
+                string unitDisplay = product.UnitOfMeasure switch
+                {
+                    UnitOfMeasure.Kilograms => "кг",
+                    UnitOfMeasure.Liters => "л",
+                    _ => "шт"
+                };
+
+                TempData["SuccessMessage"] = $"Операцію успішно створено. Поточний залишок: {product.Quantity} {unitDisplay}";
                 return RedirectToAction(nameof(Index));
             }
 

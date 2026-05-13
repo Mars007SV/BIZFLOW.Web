@@ -2,12 +2,19 @@
 
 @{
     ViewData["Title"] = "Історія операцій";
+    var firstOperation = Model.FirstOrDefault();
+    var unitDisplay = firstOperation?.Product.UnitOfMeasure switch
+    {
+        BIZFLOW.Web.Models.UnitOfMeasure.Kilograms => "кг",
+        BIZFLOW.Web.Models.UnitOfMeasure.Liters => "л",
+        _ => "шт"
+    };
 }
 
 <h1>Історія операцій: @ViewData["ProductName"]</h1>
 
 <div class="alert alert-info">
-    <strong>Поточна кількість на складі:</strong> @ViewData["CurrentQuantity"] одиниць
+    <strong>Поточна кількість на складі:</strong> @ViewData["CurrentQuantity"] @unitDisplay
 </div>
 
 <p>
@@ -49,15 +56,15 @@
                     <td>
                         @if (item.Type == "Incoming")
                         {
-                            <span class="text-success"><strong>+@item.Quantity</strong></span>
+                            <span class="text-success"><strong>+@item.Quantity @unitDisplay</strong></span>
                         }
                         else
                         {
-                            <span class="text-danger"><strong>-@item.Quantity</strong></span>
+                            <span class="text-danger"><strong>-@item.Quantity @unitDisplay</strong></span>
                         }
                     </td>
                     <td>
-                        <strong>@item.RemainingQuantity</strong>
+                        <strong>@item.RemainingQuantity @unitDisplay</strong>
                     </td>
                     <td>
                         @(string.IsNullOrEmpty(item.Description) ? "-" : item.Description)

@@ -2,6 +2,12 @@
 
 @{
     ViewData["Title"] = "Деталі операції";
+    var unitDisplay = Model.Product.UnitOfMeasure switch
+    {
+        BIZFLOW.Web.Models.UnitOfMeasure.Kilograms => "кг",
+        BIZFLOW.Web.Models.UnitOfMeasure.Liters => "л",
+        _ => "шт"
+    };
 }
 
 <h1>Деталі операції</h1>
@@ -46,11 +52,11 @@
             <dd class="col-sm-9">
                 @if (Model.Type == "Incoming")
                 {
-                    <span class="text-success fs-5"><strong>+@Model.Quantity</strong></span>
+                    <span class="text-success fs-5"><strong>+@Model.Quantity @unitDisplay</strong></span>
                 }
                 else
                 {
-                    <span class="text-danger fs-5"><strong>-@Model.Quantity</strong></span>
+                    <span class="text-danger fs-5"><strong>-@Model.Quantity @unitDisplay</strong></span>
                 }
             </dd>
 
@@ -58,7 +64,7 @@
                 @Html.DisplayNameFor(model => model.RemainingQuantity)
             </dt>
             <dd class="col-sm-9">
-                <strong>@Model.RemainingQuantity</strong> одиниць
+                <strong>@Model.RemainingQuantity @unitDisplay</strong>
             </dd>
 
             <dt class="col-sm-3">

@@ -20,7 +20,8 @@ namespace BIZFLOW.Web.Models.ViewModels
     {
         public string ProductName { get; set; } = string.Empty;
         public string OperationType { get; set; } = string.Empty;
-        public int Quantity { get; set; }
+        public decimal Quantity { get; set; }
+        public UnitOfMeasure UnitOfMeasure { get; set; }
         public DateTime Date { get; set; }
         public string? UserName { get; set; }
     }

@@ -144,6 +144,12 @@
                     <tbody>
                         @foreach (var activity in Model.RecentActivities)
                         {
+                            var unitDisplay = activity.UnitOfMeasure switch
+                            {
+                                BIZFLOW.Web.Models.UnitOfMeasure.Kilograms => "кг",
+                                BIZFLOW.Web.Models.UnitOfMeasure.Liters => "л",
+                                _ => "шт"
+                            };
                             <tr>
                                 <td class="px-4">
                                     <strong>@activity.ProductName</strong>
@@ -163,7 +169,7 @@
                                     }
                                 </td>
                                 <td>
-                                    <span class="fw-semibold">@activity.Quantity шт.</span>
+                                    <span class="fw-semibold">@activity.Quantity @unitDisplay</span>
                                 </td>
                                 <td>
                                     <span class="text-muted">@activity.Date.ToString("dd.MM.yyyy HH:mm")</span>

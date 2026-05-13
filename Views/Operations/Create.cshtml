@@ -33,8 +33,9 @@
 
             <div class="form-group mb-3">
                 <label asp-for="Quantity" class="control-label"></label>
-                <input asp-for="Quantity" class="form-control" type="number" min="1" />
+                <input asp-for="Quantity" class="form-control" type="number" step="0.001" min="0.001" />
                 <span asp-validation-for="Quantity" class="text-danger"></span>
+                <small class="form-text text-muted">Введіть кількість (підтримуються дробові значення для кг/л)</small>
             </div>
 
             <div class="form-group mb-3">

@@ -15,8 +15,8 @@ namespace BIZFLOW.Web.Models
 
         [Required]
         [Display(Name = "Кількість")]
-        [Range(1, int.MaxValue, ErrorMessage = "Кількість повинна бути більше 0")]
-        public int Quantity { get; set; } // Quantity of the operation
+        [Range(0.001, double.MaxValue, ErrorMessage = "Кількість повинна бути більше 0")]
+        public decimal Quantity { get; set; } // Quantity of the operation
 
         [Required]
         [Display(Name = "Тип операції")]
@@ -35,6 +35,6 @@ namespace BIZFLOW.Web.Models
         public string? UserName { get; set; } // User who performed the operation
 
         [Display(Name = "Залишок після операції")]
-        public int RemainingQuantity { get; set; } // Product quantity after operation
+        public decimal RemainingQuantity { get; set; } // Product quantity after operation
     }
 }

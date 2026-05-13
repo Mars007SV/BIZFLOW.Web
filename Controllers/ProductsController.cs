@@ -57,7 +57,7 @@ namespace BIZFLOW.Web.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Quantity,CategoryId")] Product product)
+        public async Task<IActionResult> Create([Bind("Id,Name,Quantity,UnitOfMeasure,CategoryId")] Product product)
         {
             if (ModelState.IsValid)
             {
@@ -91,7 +91,7 @@ namespace BIZFLOW.Web.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Quantity,CategoryId")] Product product)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Quantity,UnitOfMeasure,CategoryId")] Product product)
         {
             if (id != product.Id)
             {

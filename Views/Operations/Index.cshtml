@@ -107,6 +107,12 @@
         </thead>
         <tbody>
     @foreach (var item in Model) {
+            var unitDisplay = item.Product.UnitOfMeasure switch
+            {
+                BIZFLOW.Web.Models.UnitOfMeasure.Kilograms => "кг",
+                BIZFLOW.Web.Models.UnitOfMeasure.Liters => "л",
+                _ => "шт"
+            };
             <tr>
                 <td>
                     @item.Date.ToString("dd.MM.yyyy HH:mm")
@@ -127,15 +133,15 @@
                 <td>
                     @if (item.Type == "Incoming")
                     {
-                        <span class="text-success">+@item.Quantity</span>
+                        <span class="text-success">+@item.Quantity @unitDisplay</span>
                     }
                     else
                     {
-                        <span class="text-danger">-@item.Quantity</span>
+                        <span class="text-danger">-@item.Quantity @unitDisplay</span>
                     }
                 </td>
                 <td>
-                    <strong>@item.RemainingQuantity</strong>
+                    <strong>@item.RemainingQuantity @unitDisplay</strong>
                 </td>
                 <td>
                     @(string.IsNullOrEmpty(item.Description) ? "-" : item.Description)

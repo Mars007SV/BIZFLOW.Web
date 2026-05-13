@@ -1,13 +1,18 @@
 ﻿@model BIZFLOW.Web.Models.Product
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Деталі товару";
+    var unitDisplay = Model.UnitOfMeasure switch
+    {
+        BIZFLOW.Web.Models.UnitOfMeasure.Kilograms => "кг",
+        BIZFLOW.Web.Models.UnitOfMeasure.Liters => "л",
+        _ => "шт"
+    };
 }
 
-<h1>Details</h1>
+<h1>Деталі товару</h1>
 
 <div>
-    <h4>Product</h4>
     <hr />
     <dl class="row">
         <dt class = "col-sm-2">
@@ -20,17 +25,23 @@
             @Html.DisplayNameFor(model => model.Quantity)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Quantity)
+            @Model.Quantity @unitDisplay
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.UnitOfMeasure)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.UnitOfMeasure)
         </dd>
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.Category)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Category.Id)
+            @Model.Category?.Name
         </dd>
     </dl>
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Edit" asp-route-id="@Model?.Id">Редагувати</a> |
+    <a asp-action="Index">Назад до списку</a>
 </div>
