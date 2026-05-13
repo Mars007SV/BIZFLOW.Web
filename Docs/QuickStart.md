@@ -193,3 +193,4 @@ dotnet ef database update
 - 📖 [AuthenticationGuide.md](AuthenticationGuide.md) - інструкція користувача
 - 📖 [TechnicalDetails.md](TechnicalDetails.md) - архітектура системи
 - 📖 [TestReport.md](TestReport.md) - звіт перевірки
+

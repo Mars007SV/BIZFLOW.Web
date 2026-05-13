@@ -25,10 +25,35 @@ builder.Services.AddSession(options =>
 // Реєстрація AuthService
 builder.Services.AddScoped<IAuthService, AuthService>();
 
+// Створюємо окрему базу даних для кожного користувача Windows
+var userDataPath = GetUserDataPath();
+var dbPath = Path.Combine(userDataPath, "bizflow.db");
+var connectionString = $"Data Source={dbPath}";
+
+Console.WriteLine($"📂 Директорія даних користувача: {userDataPath}");
+Console.WriteLine($"🗄️ База даних: {dbPath}");
+
 builder.Services.AddDbContext<BizFlowDbContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlite(connectionString));
 
 var app = builder.Build();
+
+// Автоматично застосовуємо міграції для бази даних користувача
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<BizFlowDbContext>();
+
+    try
+    {
+        Console.WriteLine("🔄 Перевірка та застосування міграцій...");
+        dbContext.Database.Migrate();
+        Console.WriteLine("✅ База даних готова!");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"⚠️ Помилка при застосуванні міграцій: {ex.Message}");
+    }
+}
 
 // Configure the HTTP request pipeline.
 app.UseExceptionHandler("/Home/Error");
@@ -60,6 +85,26 @@ Console.WriteLine($"BIZFLOW запущено на {url}");
 Console.WriteLine("Натисніть Ctrl+C для завершення...");
 
 app.Run();
+
+// Отримуємо шлях до даних користувача Windows
+static string GetUserDataPath()
+{
+    // Отримуємо ім'я користувача Windows
+    var userName = Environment.UserName;
+
+    // Створюємо шлях: C:\Users\[UserName]\AppData\Local\BIZFLOW
+    var appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+    var userDataPath = Path.Combine(appDataPath, "BIZFLOW");
+
+    // Створюємо директорію якщо не існує
+    if (!Directory.Exists(userDataPath))
+    {
+        Directory.CreateDirectory(userDataPath);
+        Console.WriteLine($"✅ Створено директорію для користувача: {userName}");
+    }
+
+    return userDataPath;
+}
 
 static void OpenBrowser(string url)
 {
