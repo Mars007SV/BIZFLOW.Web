@@ -1,4 +1,5 @@
-﻿@{
+﻿@model BIZFLOW.Web.Models.ViewModels.DashboardViewModel
+@{
     ViewData["Title"] = "Головна";
 }
 
@@ -24,6 +25,173 @@
                 <i class="bi bi-clock-history"></i> Історія операцій
             </a>
         </div>
+    </div>
+</div>
+
+<!-- Ключові показники (Статистика) -->
+<div class="row g-4 mb-5">
+    <div class="col-lg-3 col-md-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted text-uppercase mb-2">Всього товарів</h6>
+                        <h2 class="mb-0 fw-bold text-primary">@Model.Statistics.TotalProducts</h2>
+                    </div>
+                    <div class="bg-primary bg-opacity-10 rounded-circle p-3">
+                        <i class="bi bi-box-seam fs-2 text-primary"></i>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <a asp-controller="Products" asp-action="Index" class="text-decoration-none small">
+                        Переглянути всі <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted text-uppercase mb-2">В дефіциті</h6>
+                        <h2 class="mb-0 fw-bold text-danger">@Model.Statistics.ProductsInDeficit</h2>
+                    </div>
+                    <div class="bg-danger bg-opacity-10 rounded-circle p-3">
+                        <i class="bi bi-exclamation-triangle fs-2 text-danger"></i>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <span class="text-muted small">
+                        <i class="bi bi-info-circle"></i> Залишок менше 5 шт.
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted text-uppercase mb-2">Операції за тиждень</h6>
+                        <h2 class="mb-0 fw-bold text-success">@Model.Statistics.RecentOperationsCount</h2>
+                    </div>
+                    <div class="bg-success bg-opacity-10 rounded-circle p-3">
+                        <i class="bi bi-arrow-left-right fs-2 text-success"></i>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <a asp-controller="Operations" asp-action="Index" class="text-decoration-none small">
+                        Детальніше <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted text-uppercase mb-2">Категорій</h6>
+                        <h2 class="mb-0 fw-bold text-info">@Model.Statistics.TotalCategories</h2>
+                    </div>
+                    <div class="bg-info bg-opacity-10 rounded-circle p-3">
+                        <i class="bi bi-grid-3x3 fs-2 text-info"></i>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <a asp-controller="Categories" asp-action="Index" class="text-decoration-none small">
+                        Керувати <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Останні активності (Таблиця) -->
+<div class="card border-0 shadow-sm mb-5">
+    <div class="card-header bg-white py-3">
+        <div class="d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 fw-bold">
+                <i class="bi bi-clock-history text-primary"></i> Останні активності
+            </h5>
+            <a asp-controller="Operations" asp-action="Index" class="btn btn-sm btn-outline-primary">
+                Переглянути всі <i class="bi bi-arrow-right"></i>
+            </a>
+        </div>
+    </div>
+    <div class="card-body p-0">
+        @if (Model.RecentActivities.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="px-4">Товар</th>
+                            <th>Тип операції</th>
+                            <th>Кількість</th>
+                            <th>Дата</th>
+                            <th>Користувач</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var activity in Model.RecentActivities)
+                        {
+                            <tr>
+                                <td class="px-4">
+                                    <strong>@activity.ProductName</strong>
+                                </td>
+                                <td>
+                                    @if (activity.OperationType == "Прихід")
+                                    {
+                                        <span class="badge bg-success">
+                                            <i class="bi bi-arrow-down-circle"></i> @activity.OperationType
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-warning text-dark">
+                                            <i class="bi bi-arrow-up-circle"></i> @activity.OperationType
+                                        </span>
+                                    }
+                                </td>
+                                <td>
+                                    <span class="fw-semibold">@activity.Quantity шт.</span>
+                                </td>
+                                <td>
+                                    <span class="text-muted">@activity.Date.ToString("dd.MM.yyyy HH:mm")</span>
+                                </td>
+                                <td>
+                                    @if (!string.IsNullOrEmpty(activity.UserName))
+                                    {
+                                        <i class="bi bi-person-circle text-muted"></i>
+                                        <span>@activity.UserName</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">—</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="text-center py-5">
+                <i class="bi bi-inbox fs-1 text-muted"></i>
+                <p class="text-muted mt-3">Поки що немає операцій</p>
+            </div>
+        }
     </div>
 </div>
 

@@ -1,6 +1,9 @@
+using BIZFLOW.Web.Data;
 using BIZFLOW.Web.Models;
+using BIZFLOW.Web.Models.ViewModels;
 using BIZFLOW.Web.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 
 namespace BIZFLOW.Web.Controllers
@@ -9,16 +12,18 @@ namespace BIZFLOW.Web.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly IAuthService _authService;
+        private readonly BizFlowDbContext _context;
 
-        public HomeController(ILogger<HomeController> logger, IAuthService authService)
+        public HomeController(ILogger<HomeController> logger, IAuthService authService, BizFlowDbContext context)
         {
             _logger = logger;
             _authService = authService;
+            _context = context;
         }
 
         public async Task<IActionResult> Index()
         {
-            // Приклад отримання поточного користувача
+            // Отримання поточного користувача
             var currentUser = await _authService.GetCurrentUserAsync(HttpContext);
             if (currentUser != null)
             {
@@ -26,7 +31,34 @@ namespace BIZFLOW.Web.Controllers
                 ViewBag.UserId = currentUser.Id;
             }
 
-            return View();
+            // Збір статистики
+            var viewModel = new DashboardViewModel
+            {
+                Statistics = new DashboardStatistics
+                {
+                    TotalProducts = await _context.Products.CountAsync(),
+                    ProductsInDeficit = await _context.Products.CountAsync(p => p.Quantity < 5),
+                    RecentOperationsCount = await _context.Operations
+                        .Where(o => o.Date >= DateTime.Now.AddDays(-7))
+                        .CountAsync(),
+                    TotalCategories = await _context.Categories.CountAsync()
+                },
+                RecentActivities = await _context.Operations
+                    .Include(o => o.Product)
+                    .OrderByDescending(o => o.Date)
+                    .Take(10)
+                    .Select(o => new RecentActivity
+                    {
+                        ProductName = o.Product!.Name,
+                        OperationType = o.Type,
+                        Quantity = o.Quantity,
+                        Date = o.Date,
+                        UserName = o.UserName
+                    })
+                    .ToListAsync()
+            };
+
+            return View(viewModel);
         }
 
         public IActionResult Privacy()
