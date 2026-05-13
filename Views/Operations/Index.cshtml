@@ -16,6 +16,27 @@
 
 <p>
     <a asp-action="Create" class="btn btn-primary">Створити нову операцію</a>
+
+    <!-- Dropdown для експорту звіту -->
+    <div class="btn-group ms-2" role="group">
+        <button type="button" class="btn btn-success dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+            📊 Сформувати звіт
+        </button>
+        <ul class="dropdown-menu">
+            <li>
+                <a class="dropdown-item" asp-action="ExportToExcel">
+                    <i class="bi bi-file-earmark-excel"></i> Експорт у Excel
+                </a>
+            </li>
+            <li>
+                <a class="dropdown-item" asp-action="ExportToCsv">
+                    <i class="bi bi-file-earmark-text"></i> Експорт у CSV
+                </a>
+            </li>
+            <li><hr class="dropdown-divider"></li>
+            <li><span class="dropdown-item-text text-muted small">Звіт містить дані по всіх продуктах</span></li>
+        </ul>
+    </div>
 </p>
 
 <!-- Filters -->

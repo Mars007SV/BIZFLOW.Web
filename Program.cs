@@ -25,6 +25,9 @@ builder.Services.AddSession(options =>
 // Реєстрація AuthService
 builder.Services.AddScoped<IAuthService, AuthService>();
 
+// Реєстрація ReportService
+builder.Services.AddScoped<IReportService, ReportService>();
+
 // Створюємо окрему базу даних для кожного користувача Windows
 var userDataPath = GetUserDataPath();
 var dbPath = Path.Combine(userDataPath, "bizflow.db");

@@ -7,16 +7,19 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using BIZFLOW.Web.Data;
 using BIZFLOW.Web.Models;
+using BIZFLOW.Web.Services;
 
 namespace BIZFLOW.Web.Controllers
 {
     public class OperationsController : Controller
     {
         private readonly BizFlowDbContext _context;
+        private readonly IReportService _reportService;
 
-        public OperationsController(BizFlowDbContext context)
+        public OperationsController(BizFlowDbContext context, IReportService reportService)
         {
             _context = context;
+            _reportService = reportService;
         }
 
         // GET: Operations
@@ -276,6 +279,28 @@ namespace BIZFLOW.Web.Controllers
                 .ToListAsync();
 
             return View(operations);
+        }
+
+        // GET: Operations/ExportToExcel
+        public async Task<IActionResult> ExportToExcel()
+        {
+            var userName = User?.Identity?.Name ?? "Система";
+            var reportData = await _reportService.GenerateReportDataAsync(userName);
+            var excelFile = _reportService.GenerateExcelReport(reportData);
+
+            var fileName = $"Звіт_BIZFLOW_{DateTime.Now:yyyy-MM-dd_HH-mm}.xlsx";
+            return File(excelFile, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
+        }
+
+        // GET: Operations/ExportToCsv
+        public async Task<IActionResult> ExportToCsv()
+        {
+            var userName = User?.Identity?.Name ?? "Система";
+            var reportData = await _reportService.GenerateReportDataAsync(userName);
+            var csvFile = _reportService.GenerateCsvReport(reportData);
+
+            var fileName = $"Звіт_BIZFLOW_{DateTime.Now:yyyy-MM-dd_HH-mm}.csv";
+            return File(csvFile, "text/csv", fileName);
         }
     }
 }
