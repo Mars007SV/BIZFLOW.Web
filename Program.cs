@@ -121,40 +121,8 @@ async Task ConfigureElectronWindow()
     }
     else
     {
-        // Якщо Electron не активний, відкриваємо браузер автоматично
-        var url = "http://localhost:5000";
-        try
-        {
-            Console.WriteLine($"🌐 Відкриття браузера: {url}");
-
-            // Чекаємо 2 секунди поки сервер запуститься
-            await Task.Delay(2000);
-
-            // Відкриваємо браузер залежно від ОС
-            if (OperatingSystem.IsWindows())
-            {
-                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
-                {
-                    FileName = url,
-                    UseShellExecute = true
-                });
-            }
-            else if (OperatingSystem.IsLinux())
-            {
-                System.Diagnostics.Process.Start("xdg-open", url);
-            }
-            else if (OperatingSystem.IsMacOS())
-            {
-                System.Diagnostics.Process.Start("open", url);
-            }
-
-            Console.WriteLine("✅ Браузер відкрито!");
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"⚠️ Не вдалося відкрити браузер автоматично: {ex.Message}");
-            Console.WriteLine($"Відкрийте браузер вручну: {url}");
-        }
+        // Якщо Electron не активний, браузер відкриється через launchSettings.json
+        Console.WriteLine("🌐 Запуск у режимі веб-застосунку");
     }
 }
 
