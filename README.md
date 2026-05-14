@@ -38,35 +38,47 @@ C:\Users\[ВашеІм'я]\AppData\Local\BIZFLOW\bizflow.db
 
 Детальніше: [AuthenticationGuide.md](Docs/AuthenticationGuide.md)
 
-## 🖥️ Desktop версія (Рекомендовано!)
+## 🖥️ Desktop версія (Electron.NET)
 
-BIZFLOW працює як **desktop додаток** - не потрібен інтернет, всі дані зберігаються локально!
+BIZFLOW працює як **кросплатформний desktop додаток** на базі Electron.NET!
+
+### ✨ Переваги:
+- 🌍 **Windows, macOS, Linux** - одна кодова база
+- 📴 **Повністю офлайн** - не потрібен інтернет
+- 💾 **Локальна база даних** - всі дані на вашому ПК
+- 🚀 **Швидкий запуск** - як звичайний додаток
+- 📦 **Інсталятор** - легка установка для користувачів
 
 ### Швидкий старт:
 
 ```powershell
-# Для розробки
-dotnet run
+# Режим розробки (з DevTools)
+electronize start
 
-# Або запустіть
-start-desktop.ps1
+# Збірка для Windows (x64)
+electronize build /target win /electron-arch x64
+
+# Збірка для macOS
+electronize build /target osx /electron-arch x64
+
+# Збірка для Linux
+electronize build /target linux /electron-arch x64
 ```
 
-### Створення EXE для розповсюдження:
-
-```powershell
-.\publish-desktop.ps1
-```
-
-Детальні інструкції: [DESKTOP-INSTRUCTIONS.md](DESKTOP-INSTRUCTIONS.md)
+### 📚 Детальні інструкції:
+- **[Electron Build Guide](ELECTRON_BUILD_GUIDE.md)** - Повний посібник зі збірки
+- **[User Guide (UA)](USER_GUIDE_UA.md)** - Інструкція для кінцевих користувачів
+- **[Git Workflow](GIT_WORKFLOW.md)** - Робота з гілками Git
 
 ## 🚀 Технології
 
-- **Backend**: ASP.NET Core 10 MVC
-- **Database**: SQLite (локальна база даних)
-- **Frontend**: Bootstrap 5, HTML5, CSS3
+- **Backend**: ASP.NET Core 10 (Razor Pages/MVC)
+- **Desktop**: Electron.NET 23.6.2 (Chromium + Node.js)
+- **Database**: SQLite with Entity Framework Core 10
+- **Frontend**: Bootstrap 5, HTML5, CSS3, JavaScript
+- **Reports**: ClosedXML (Excel generation)
 - **Security**: SHA256 password hashing, Session-based auth
-- **Deployment**: Self-contained executable
+- **Deployment**: Self-contained executables (Windows/macOS/Linux)
 
 ## 📋 Функціональність
 
@@ -120,8 +132,14 @@ BIZFLOW.Web/
 
 ## 📚 Документація
 
-- [Інструкції Desktop версії](DESKTOP-INSTRUCTIONS.md)
-- [README Desktop](README-DESKTOP.md)
+### Для розробників:
+- **[Git Workflow Guide](GIT_WORKFLOW.md)** - Стратегія роботи з гілками та коміти
+- **[Electron Build Guide](ELECTRON_BUILD_GUIDE.md)** - Інструкції зі збірки desktop додатку
+- **[Multi-User System](Docs/MultiUserSystem.md)** - Система ізоляції баз даних
+- **[Authentication Guide](Docs/AuthenticationGuide.md)** - Система автентифікації
+
+### Для користувачів:
+- **[User Guide (UA)](USER_GUIDE_UA.md)** - Інструкція користувача українською
 
 ## 🤝 Підтримка
 
