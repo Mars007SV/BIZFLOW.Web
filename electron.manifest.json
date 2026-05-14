@@ -1,0 +1,39 @@
+{
+  "executable": "BIZFLOW",
+  "splashscreen": {
+    "imageFile": ""
+  },
+  "singleInstance": true,
+  "build": {
+    "appId": "com.bizflow.desktop",
+    "productName": "BIZFLOW",
+    "copyright": "Copyright © 2025",
+    "buildVersion": "1.0.0",
+    "compression": "maximum",
+    "files": [
+      "**/*"
+    ],
+    "extraResources": [
+      "bin/**/*"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "wwwroot/favicon.ico"
+    },
+    "linux": {
+      "target": "AppImage",
+      "icon": "wwwroot/favicon.ico"
+    },
+    "mac": {
+      "target": "dmg",
+      "icon": "wwwroot/favicon.ico"
+    }
+  }
+}

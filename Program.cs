@@ -2,13 +2,13 @@ using BIZFLOW.Web.Data;
 using BIZFLOW.Web.Middleware;
 using BIZFLOW.Web.Services;
 using Microsoft.EntityFrameworkCore;
-using System.Diagnostics;
-using System.Runtime.InteropServices;
+using ElectronNET.API;
+using ElectronNET.API.Entities;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Налаштування для Desktop режиму
-builder.WebHost.UseUrls("http://localhost:5555");
+// Додаємо підтримку Electron.NET
+builder.WebHost.UseElectron(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
@@ -80,14 +80,46 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
 
-// Автоматичне відкриття браузера
-var url = "http://localhost:5555";
-OpenBrowser(url);
-
-Console.WriteLine($"BIZFLOW запущено на {url}");
-Console.WriteLine("Натисніть Ctrl+C для завершення...");
+// Налаштування Electron Desktop вікна
+await ConfigureElectronWindow();
 
 app.Run();
+
+// Налаштування Electron Desktop
+async Task ConfigureElectronWindow()
+{
+    if (HybridSupport.IsElectronActive)
+    {
+        var browserWindow = await Electron.WindowManager.CreateWindowAsync(new BrowserWindowOptions
+        {
+            Width = 1400,
+            Height = 900,
+            Title = "BIZFLOW - Бізнес Управління",
+            Icon = "/favicon.ico",
+            WebPreferences = new WebPreferences
+            {
+                NodeIntegration = false,
+                ContextIsolation = true
+            },
+            AutoHideMenuBar = true, // Приховати меню
+            Center = true
+        });
+
+        // Відкрити DevTools тільки в режимі розробки
+        if (builder.Environment.IsDevelopment())
+        {
+            browserWindow.WebContents.OpenDevTools();
+        }
+
+        // Обробка закриття вікна
+        browserWindow.OnClosed += () =>
+        {
+            Electron.App.Quit();
+        };
+
+        Console.WriteLine("✅ BIZFLOW Desktop запущено!");
+    }
+}
 
 // Отримуємо шлях до даних користувача Windows
 static string GetUserDataPath()
@@ -107,27 +139,4 @@ static string GetUserDataPath()
     }
 
     return userDataPath;
-}
-
-static void OpenBrowser(string url)
-{
-    try
-    {
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-        {
-            Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
-        }
-        else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-        {
-            Process.Start("xdg-open", url);
-        }
-        else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-        {
-            Process.Start("open", url);
-        }
-    }
-    catch
-    {
-        // Якщо не вдалося відкрити, користувач зможе відкрити вручну
-    }
 }
