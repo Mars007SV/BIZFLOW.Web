@@ -10,6 +10,12 @@ var builder = WebApplication.CreateBuilder(args);
 // Додаємо підтримку Electron.NET
 builder.WebHost.UseElectron(args);
 
+// Налаштовуємо порти за замовчуванням (якщо не запущено через Visual Studio)
+if (!builder.Environment.IsDevelopment() || args.Contains("--launch-profile"))
+{
+    builder.WebHost.UseUrls("http://localhost:5555");
+}
+
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
@@ -121,8 +127,57 @@ async Task ConfigureElectronWindow()
     }
     else
     {
-        // Якщо Electron не активний, браузер відкриється через launchSettings.json
-        Console.WriteLine("🌐 Запуск у режимі веб-застосунку");
+        // Якщо Electron не активний, перевіряємо чи запущено через Visual Studio
+        var isVisualStudio = args.Any(a => a.Contains("--launch-profile")) || 
+                            Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development";
+
+        if (!isVisualStudio)
+        {
+            // Запущено через .bat або .exe - відкриваємо браузер автоматично
+            var url = "http://localhost:5555";
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+                    Console.WriteLine($"🌐 Очікування запуску сервера на {url}...");
+
+                    // Чекаємо поки сервер запуститься
+                    await Task.Delay(3000);
+
+                    Console.WriteLine($"🌐 Відкриття браузера: {url}");
+
+                    // Відкриваємо браузер
+                    if (OperatingSystem.IsWindows())
+                    {
+                        System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+                        {
+                            FileName = url,
+                            UseShellExecute = true
+                        });
+                    }
+                    else if (OperatingSystem.IsLinux())
+                    {
+                        System.Diagnostics.Process.Start("xdg-open", url);
+                    }
+                    else if (OperatingSystem.IsMacOS())
+                    {
+                        System.Diagnostics.Process.Start("open", url);
+                    }
+
+                    Console.WriteLine("✅ Браузер відкрито!");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"⚠️ Не вдалося відкрити браузер: {ex.Message}");
+                    Console.WriteLine($"Відкрийте браузер вручну: {url}");
+                }
+            });
+        }
+        else
+        {
+            // Запущено через Visual Studio - браузер відкриється через launchSettings.json
+            Console.WriteLine("🌐 Запуск у режимі веб-застосунку (Visual Studio)");
+        }
     }
 }
 
