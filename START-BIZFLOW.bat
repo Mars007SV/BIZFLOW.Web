@@ -13,7 +13,7 @@ echo.
 echo ═══════════════════════════════════════════════════════════
 echo.
 
-dotnet run
+dotnet run --launch-profile BIZFLOW
 
 echo.
 echo ✅ BIZFLOW закрито
