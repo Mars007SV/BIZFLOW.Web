@@ -13,23 +13,10 @@ echo.
 echo ═══════════════════════════════════════════════════════════
 echo.
 
-REM Запускаємо сервер у фоновому режимі та відкриваємо браузер
-start /B dotnet run --launch-profile BIZFLOW
+REM Запускаємо сервер (браузер відкриється автоматично через launchSettings.json)
+dotnet run --launch-profile BIZFLOW
 
-REM Чекаємо 5 секунд поки сервер запуститься
-timeout /t 5 /nobreak >nul
-
-REM Відкриваємо браузер
-start http://localhost:5555
-
-REM Чекаємо завершення процесу dotnet
-echo.
-echo Натисніть будь-яку клавішу для завершення...
-pause >nul
-
-REM Завершуємо всі процеси dotnet
-taskkill /IM dotnet.exe /F >nul 2>&1
-
+REM Сервер зупинено автоматично після закриття (Ctrl+C)
 echo.
 echo ✅ BIZFLOW закрито
 echo.
