@@ -1,154 +1,171 @@
-# BIZFLOW - Система управління товарними запасами
+# BIZFLOW - Inventory Management System
 
-## 🎯 Про проєкт
+## 🎯 About
 
-BIZFLOW - це професійна система для управління товарними запасами, яка дозволяє:
-- ✅ Відстежувати залишки товарів
-- ✅ Організовувати товари за категоріями
-- ✅ Вести історію всіх операцій з детальним аудитом
-- ✅ Працювати локально на вашому комп'ютері
-- 🔐 **Захищений вхід з авторизацією користувачів**
-- 👥 **Кожен користувач Windows має свою окрему базу даних**
+BIZFLOW is a professional inventory management system that allows you to:
+- ✅ Track product stock levels
+- ✅ Organize products by categories
+- ✅ Maintain detailed operation history with full audit trail
+- ✅ Work locally on your computer
+- 🔐 **Secure user authentication and authorization**
+- 👥 **Separate database for each Windows user**
 
-## 👥 Багатокористувацька система
+## 🚀 Quick Start
 
-**Кожен користувач Windows має свої дані!**
-
+### For Users
+```bash
+# Download and run
+BIZFLOW.exe
 ```
-🖥️ Один комп'ютер
-   ├── 👤 Користувач 1 → Своя база даних
-   ├── 👤 Користувач 2 → Своя база даних
-   └── 👤 Користувач 3 → Своя база даних
-```
+Browser opens automatically at `http://localhost:5000`
 
-**База даних зберігається:**
-```
-C:\Users\[ВашеІм'я]\AppData\Local\BIZFLOW\bizflow.db
-```
+### For Developers
+```bash
+# Clone repository
+git clone https://github.com/Mars007SV/BIZFLOW.Web.git
+cd BIZFLOW.Web
 
-Детальніше: [MultiUserSystem.md](Docs/MultiUserSystem.md)
-
-## 🔐 Авторизація
-
-При першому запуску вам потрібно **створити обліковий запис**:
-1. Натисніть "Зареєструватися"
-2. Введіть ім'я користувача (3-50 символів)
-3. Створіть пароль (мінімум 6 символів)
-4. Готово! Можете користуватися системою
-
-Детальніше: [AuthenticationGuide.md](Docs/AuthenticationGuide.md)
-
-## 🖥️ Desktop версія (Electron.NET)
-
-BIZFLOW працює як **кросплатформний desktop додаток** на базі Electron.NET!
-
-### ✨ Переваги:
-- 🌍 **Windows, macOS, Linux** - одна кодова база
-- 📴 **Повністю офлайн** - не потрібен інтернет
-- 💾 **Локальна база даних** - всі дані на вашому ПК
-- 🚀 **Швидкий запуск** - як звичайний додаток
-- 📦 **Інсталятор** - легка установка для користувачів
-
-### Швидкий старт:
-
-```powershell
-# Режим розробки (з DevTools)
-electronize start
-
-# Збірка для Windows (x64)
-electronize build /target win /electron-arch x64
-
-# Збірка для macOS
-electronize build /target osx /electron-arch x64
-
-# Збірка для Linux
-electronize build /target linux /electron-arch x64
+# Run development server
+START-BIZFLOW.bat
 ```
 
-### 📚 Детальні інструкції:
-- **[Electron Build Guide](ELECTRON_BUILD_GUIDE.md)** - Повний посібник зі збірки
-- **[User Guide (UA)](USER_GUIDE_UA.md)** - Інструкція для кінцевих користувачів
-- **[Git Workflow](GIT_WORKFLOW.md)** - Робота з гілками Git
-
-## 🚀 Технології
-
-- **Backend**: ASP.NET Core 10 (Razor Pages/MVC)
-- **Desktop**: Electron.NET 23.6.2 (Chromium + Node.js)
-- **Database**: SQLite with Entity Framework Core 10
-- **Frontend**: Bootstrap 5, HTML5, CSS3, JavaScript
-- **Reports**: ClosedXML (Excel generation)
-- **Security**: SHA256 password hashing, Session-based auth
-- **Deployment**: Self-contained executables (Windows/macOS/Linux)
-
-## 📋 Функціональність
-
-### 🔐 Система авторизації
-- Реєстрація та вхід користувачів
-- Безпечне зберігання паролів (SHA256)
-- Профіль користувача з можливістю редагування
-- Список всіх користувачів системи
-
-### Управління товарами
-- Додавання, редагування, видалення товарів
-- Відстеження кількості на складі
-- Прив'язка до категорій
-
-### Категорії
-- Організація товарів за категоріями
-- Гнучка структура каталогу
-
-### Історія операцій
-- Автоматичний аудит всіх змін
-- Детальна інформація про кожну операцію
-- Зберігання старих та нових значень
-
-## 🛠️ Системні вимоги
-
-- Windows 10/11 (x64)
-- 512 MB RAM (мінімум)
-- 150 MB вільного місця на диску
-
-## 📦 Структура проєкту
-
-```
-BIZFLOW.Web/
-├── Controllers/         # MVC контролери
-├── Models/             # Моделі даних
-├── Views/              # Razor views
-├── Data/               # DbContext
-├── Migrations/         # EF Core міграції
-├── wwwroot/            # Статичні файли
-├── publish-desktop.ps1 # Скрипт публікації Desktop версії
-└── start-desktop.ps1   # Швидкий запуск
-```
-
-## 🎨 Особливості
-
-- 🎯 Сучасний UI з Bootstrap 5
-- 🔄 Автоматичне відкриття браузера при запуску
-- 💾 SQLite база даних (не потребує сервера БД)
-- 📱 Responsive дизайн
-- 🔐 Локальне зберігання даних (безпека)
-
-## 📚 Документація
-
-### Для розробників:
-- **[Git Workflow Guide](GIT_WORKFLOW.md)** - Стратегія роботи з гілками та коміти
-- **[Electron Build Guide](ELECTRON_BUILD_GUIDE.md)** - Інструкції зі збірки desktop додатку
-- **[Multi-User System](Docs/MultiUserSystem.md)** - Система ізоляції баз даних
-- **[Authentication Guide](Docs/AuthenticationGuide.md)** - Система автентифікації
-
-### Для користувачів:
-- **[User Guide (UA)](USER_GUIDE_UA.md)** - Інструкція користувача українською
-
-## 🤝 Підтримка
-
-Якщо у вас виникли питання або проблеми, створіть Issue на GitHub.
-
-## 📄 Ліцензія
-
-Цей проєкт розроблено для навчальних та комерційних цілей.
+**📖 Full Installation & Deployment Guide:** [SETUP.md](SETUP.md)
 
 ---
 
-Made with ❤️ for efficient inventory management
+## 👥 Multi-User System
+
+**Each Windows user has their own data!**
+
+```
+🖥️ One Computer
+   ├── 👤 User 1 → Own database
+   ├── 👤 User 2 → Own database
+   └── 👤 User 3 → Own database
+```
+
+**Database location:**
+```
+C:\Users\[YourName]\AppData\Local\BIZFLOW\bizflow.db
+```
+
+---
+
+## 🔐 Authentication
+
+First time setup:
+1. Click **"Sign Up"**
+2. Enter username (3-50 characters)
+3. Create password (minimum 6 characters)
+4. Done! Start using the system
+
+---
+
+## 🛠️ Technology Stack
+
+- **Backend:** ASP.NET Core 10 (Razor Pages)
+- **Database:** SQLite with Entity Framework Core 10
+- **Frontend:** Bootstrap 5, HTML5, CSS3, JavaScript
+- **Reports:** ClosedXML (Excel generation)
+- **Security:** SHA256 password hashing, Session-based auth
+- **Desktop:** Electron.NET support ready
+
+---
+
+## ✨ Features
+
+### 🔐 User Management
+- User registration and login
+- Secure password storage (SHA256)
+- User profile editing
+- Multi-user support with isolated databases
+
+### 📦 Product Management
+- Add, edit, delete products
+- Track stock quantities
+- Category organization
+- Search and filter capabilities
+
+### 📊 Operations History
+- Automatic audit trail for all changes
+- Detailed operation information
+- Track old and new values
+- Full history of inventory movements
+
+### 📈 Reports
+- Excel export functionality
+- Inventory reports
+- Operation history reports
+
+---
+
+## 📋 System Requirements
+
+- **OS:** Windows 10/11 (x64), macOS, Linux
+- **RAM:** 512 MB minimum
+- **Disk Space:** 150 MB free space
+- **.NET:** .NET 10 Runtime (included in self-contained builds)
+
+---
+
+## 📦 Project Structure
+
+```
+BIZFLOW.Web/
+├── Controllers/           # MVC controllers
+├── Models/               # Data models
+├── Views/                # Razor views
+├── Data/                 # DbContext and database
+├── Migrations/           # EF Core migrations
+├── Services/             # Business logic services
+├── Middleware/           # Custom middleware
+├── wwwroot/              # Static files (CSS, JS, images)
+├── Properties/           # Launch settings
+├── PUBLISH-DESKTOP.bat   # Build script for production
+├── START-BIZFLOW.bat     # Development quick start
+└── SETUP.md              # Full installation guide
+```
+
+---
+
+## 📚 Documentation
+
+- **[SETUP.md](SETUP.md)** - Complete installation, development, and deployment guide
+- **[Docs/MultiUserSystem.md](Docs/MultiUserSystem.md)** - Multi-user database isolation
+- **[Docs/AuthenticationGuide.md](Docs/AuthenticationGuide.md)** - Authentication system details
+
+---
+
+## 🔄 Git Workflow
+
+### Branches
+- `main` - Stable production releases
+- `develop` - Integration branch for new features
+- `feature/*` - Feature development branches
+
+### Contributing
+```bash
+git checkout develop
+git checkout -b feature/your-feature
+# ... make changes ...
+git commit -m "feat: your feature description"
+git checkout develop
+git merge feature/your-feature
+```
+
+---
+
+## 🤝 Support
+
+If you have questions or issues, please create an issue on GitHub:
+https://github.com/Mars007SV/BIZFLOW.Web/issues
+
+---
+
+## 📄 License
+
+MIT License - See LICENSE file for details
+
+---
+
+**Made with ❤️ for efficient inventory management**
