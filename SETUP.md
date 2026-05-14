@@ -12,7 +12,7 @@
 ## 🎯 Quick Start for Users
 
 ### Running Installed Application
-After installation, simply run `BIZFLOW.exe` - the browser will open automatically at `http://localhost:5000`
+After installation, simply run `BIZFLOW.exe` - the browser will open automatically at `http://localhost:5555`
 
 ### First Time Setup
 1. Launch the application
