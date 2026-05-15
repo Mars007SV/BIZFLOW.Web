@@ -20,10 +20,28 @@ namespace BIZFLOW.Web.Controllers
         }
 
         // GET: Products
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string searchString, int? categoryFilter)
         {
-            var bizFlowDbContext = _context.Products.Include(p => p.Category);
-            return View(await bizFlowDbContext.ToListAsync());
+            var products = _context.Products.Include(p => p.Category).AsQueryable();
+
+            // Пошук по назві продукту
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                products = products.Where(p => p.Name.Contains(searchString));
+            }
+
+            // Фільтрація по категорії
+            if (categoryFilter.HasValue && categoryFilter.Value > 0)
+            {
+                products = products.Where(p => p.CategoryId == categoryFilter.Value);
+            }
+
+            // Передаємо список категорій для dropdown
+            ViewData["Categories"] = new SelectList(await _context.Categories.ToListAsync(), "Id", "Name");
+            ViewData["CurrentSearch"] = searchString;
+            ViewData["CurrentCategory"] = categoryFilter;
+
+            return View(await products.ToListAsync());
         }
 
         // GET: Products/Details/5
