@@ -10,6 +10,12 @@ var builder = WebApplication.CreateBuilder(args);
 // Додаємо підтримку Electron.NET
 builder.WebHost.UseElectron(args);
 
+// Налаштовуємо порти за замовчуванням (якщо не запущено через Visual Studio)
+if (!builder.Environment.IsDevelopment() || args.Contains("--launch-profile"))
+{
+    builder.WebHost.UseUrls("http://localhost:5555");
+}
+
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
@@ -121,39 +127,56 @@ async Task ConfigureElectronWindow()
     }
     else
     {
-        // Якщо Electron не активний, відкриваємо браузер автоматично
-        var url = "http://localhost:5000";
-        try
+        // Якщо Electron не активний, перевіряємо чи запущено через Visual Studio
+        var isVisualStudio = args.Any(a => a.Contains("--launch-profile")) || 
+                            Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development";
+
+        if (!isVisualStudio)
         {
-            Console.WriteLine($"🌐 Відкриття браузера: {url}");
-
-            // Чекаємо 2 секунди поки сервер запуститься
-            await Task.Delay(2000);
-
-            // Відкриваємо браузер залежно від ОС
-            if (OperatingSystem.IsWindows())
+            // Запущено через .bat або .exe - відкриваємо браузер автоматично
+            var url = "http://localhost:5555";
+            _ = Task.Run(async () =>
             {
-                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+                try
                 {
-                    FileName = url,
-                    UseShellExecute = true
-                });
-            }
-            else if (OperatingSystem.IsLinux())
-            {
-                System.Diagnostics.Process.Start("xdg-open", url);
-            }
-            else if (OperatingSystem.IsMacOS())
-            {
-                System.Diagnostics.Process.Start("open", url);
-            }
+                    Console.WriteLine($"🌐 Очікування запуску сервера на {url}...");
 
-            Console.WriteLine("✅ Браузер відкрито!");
+                    // Чекаємо поки сервер запуститься
+                    await Task.Delay(3000);
+
+                    Console.WriteLine($"🌐 Відкриття браузера: {url}");
+
+                    // Відкриваємо браузер
+                    if (OperatingSystem.IsWindows())
+                    {
+                        System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+                        {
+                            FileName = url,
+                            UseShellExecute = true
+                        });
+                    }
+                    else if (OperatingSystem.IsLinux())
+                    {
+                        System.Diagnostics.Process.Start("xdg-open", url);
+                    }
+                    else if (OperatingSystem.IsMacOS())
+                    {
+                        System.Diagnostics.Process.Start("open", url);
+                    }
+
+                    Console.WriteLine("✅ Браузер відкрито!");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"⚠️ Не вдалося відкрити браузер: {ex.Message}");
+                    Console.WriteLine($"Відкрийте браузер вручну: {url}");
+                }
+            });
         }
-        catch (Exception ex)
+        else
         {
-            Console.WriteLine($"⚠️ Не вдалося відкрити браузер автоматично: {ex.Message}");
-            Console.WriteLine($"Відкрийте браузер вручну: {url}");
+            // Запущено через Visual Studio - браузер відкриється через launchSettings.json
+            Console.WriteLine("🌐 Запуск у режимі веб-застосунку (Visual Studio)");
         }
     }
 }

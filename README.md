@@ -17,7 +17,7 @@ BIZFLOW is a professional inventory management system that allows you to:
 # Download and run
 BIZFLOW.exe
 ```
-Browser opens automatically at `http://localhost:5000`
+Browser opens automatically at `http://localhost:5555`
 
 ### For Developers
 ```bash
