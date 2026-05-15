@@ -1,195 +1,195 @@
-# 👥 Багатокористувацька система BIZFLOW
+# BIZFLOW Multi-User System
 
-## 🎯 Як це працює
+## How It Works
 
-Кожен користувач Windows на одному комп'ютері має **свою окрему базу даних** та **свої облікові записи**.
+Each Windows user on one computer has their own separate database and user accounts.
 
 ---
 
-## 📂 Де зберігаються дані
+## Where Data Is Stored
 
-### Шлях до бази даних:
+### Database path:
 ```
-C:\Users\[ІМ'Я_КОРИСТУВАЧА]\AppData\Local\BIZFLOW\bizflow.db
+C:\Users\[USERNAME]\AppData\Local\BIZFLOW\bizflow.db
 ```
 
-### Приклади:
-- **Користувач "Олег":** `C:\Users\Oleh\AppData\Local\BIZFLOW\bizflow.db`
-- **Користувач "Марія":** `C:\Users\Maria\AppData\Local\BIZFLOW\bizflow.db`
-- **Користувач "Admin":** `C:\Users\Admin\AppData\Local\BIZFLOW\bizflow.db`
+### Examples:
+- User "Oleh": C:\Users\Oleh\AppData\Local\BIZFLOW\bizflow.db
+- User "Maria": C:\Users\Maria\AppData\Local\BIZFLOW\bizflow.db
+- User "Admin": C:\Users\Admin\AppData\Local\BIZFLOW\bizflow.db
 
 ---
 
-## 🔐 Ізоляція даних
+## Data Isolation
 
-### ✅ Що це означає:
+### What this means:
 
-1. **Олег** входить в Windows як "Oleh"
-   - Запускає BIZFLOW
-   - Бачить **тільки свої** товари, категорії, операції
-   - Має **свої** облікові записи користувачів
+1. Oleh logs in to Windows as "Oleh"
+   - Runs BIZFLOW
+   - Sees only his products, categories, operations
+   - Has his own user accounts
 
-2. **Марія** входить в Windows як "Maria"
-   - Запускає BIZFLOW на тому самому комп'ютері
-   - Бачить **тільки свої** дані
-   - **Не бачить** дані Олега
-   - Має **окрему** базу даних
+2. Maria logs in to Windows as "Maria"
+   - Runs BIZFLOW on the same computer
+   - Sees only her data
+   - Cannot see Oleh's data
+   - Has separate database
 
-3. **Адміністратор** входить в Windows як "Admin"
-   - Має **свою окрему** базу даних
-   - **Не бачить** дані Олега або Марії
+3. Administrator logs in to Windows as "Admin"
+   - Has his own separate database
+   - Cannot see Oleh's or Maria's data
 
 ---
 
-## 🚀 Перший запуск
+## First Launch
 
-### Для кожного користувача Windows:
+### For each Windows user:
 
-1. **Увійдіть** в Windows під своїм обліковим записом
-2. **Запустіть** BIZFLOW: `dotnet run`
-3. При першому запуску:
+1. Log in to Windows with your account
+2. Run BIZFLOW: dotnet run
+3. On first launch:
    ```
-   📂 Директорія даних користувача: C:\Users\YourName\AppData\Local\BIZFLOW
-   🗄️ База даних: C:\Users\YourName\AppData\Local\BIZFLOW\bizflow.db
-   🔄 Перевірка та застосування міграцій...
-   ✅ Створено директорію для користувача: YourName
-   ✅ База даних готова!
+   User data directory: C:\Users\YourName\AppData\Local\BIZFLOW
+   Database: C:\Users\YourName\AppData\Local\BIZFLOW\bizflow.db
+   Checking and applying migrations...
+   Created directory for user: YourName
+   Database ready!
    ```
-4. **Зареєструйте** свого користувача в системі BIZFLOW
-5. **Почніть працювати!**
+4. Register your user in BIZFLOW system
+5. Start working!
 
 ---
 
-## 📊 Сценарії використання
+## Usage Scenarios
 
-### Сценарій 1: Сімейний комп'ютер
+### Scenario 1: Family Computer
 ```
-🏠 Один комп'ютер вдома
+One computer at home
 
-👨 Тато (Windows user: Dad)
-   → Своя база даних
-   → Свій магазин / склад
-   → Свої товари
+Dad (Windows user: Dad)
+   -> Own database
+   -> Own store / warehouse
+   -> Own products
 
-👩 Мама (Windows user: Mom)  
-   → Своя база даних
-   → Свій бізнес
-   → Свої товари
+Mom (Windows user: Mom)  
+   -> Own database
+   -> Own business
+   -> Own products
 
-👦 Син (Windows user: Son)
-   → Своя база даних
-   → Навчальний проєкт
-   → Свої дані
+Son (Windows user: Son)
+   -> Own database
+   -> Learning project
+   -> Own data
 ```
 
-### Сценарій 2: Офісний комп'ютер
+### Scenario 2: Office Computer
 ```
-🏢 Один комп'ютер в офісі
+One computer in office
 
-👔 Менеджер (Windows user: Manager)
-   → База даних з товарами магазину
-   → Користувачі: сам + касир
+Manager (Windows user: Manager)
+   -> Database with store products
+   -> Users: self + cashier
 
-💼 Бухгалтер (Windows user: Accountant)
-   → Своя база даних
-   → Тільки фінансові дані
+Accountant (Windows user: Accountant)
+   -> Own database
+   -> Only financial data
 
-📦 Складський (Windows user: Warehouse)
-   → Своя база даних
-   → Облік товарів на складі
+Warehouse (Windows user: Warehouse)
+   -> Own database
+   -> Warehouse inventory
 ```
 
 ---
 
-## 🔍 Перевірка даних
+## Data Verification
 
-### Як подивитися де зберігається ваша база:
+### How to see where your database is stored:
 
 ```powershell
-# Відкрити папку з даними поточного користувача
+# Open current user data folder
 explorer "$env:LOCALAPPDATA\BIZFLOW"
 
-# Або вручну
-# 1. Натисніть Win+R
-# 2. Введіть: %LOCALAPPDATA%\BIZFLOW
-# 3. Натисніть Enter
+# Or manually
+# 1. Press Win+R
+# 2. Enter: %LOCALAPPDATA%\BIZFLOW
+# 3. Press Enter
 ```
 
-### Що ви побачите:
+### What you will see:
 ```
-📁 BIZFLOW\
-   └── 📄 bizflow.db (ваша база даних)
+BIZFLOW\
+   bizflow.db (your database)
 ```
 
 ---
 
-## 💾 Резервне копіювання
+## Backup
 
-### Збереження своїх даних:
+### Save your data:
 
 ```powershell
-# Створити резервну копію
+# Create backup
 Copy-Item "$env:LOCALAPPDATA\BIZFLOW\bizflow.db" `
           "$env:USERPROFILE\Desktop\BIZFLOW_Backup_$(Get-Date -Format 'yyyy-MM-dd').db"
 ```
 
-### Відновлення з резервної копії:
+### Restore from backup:
 
 ```powershell
-# Відновити дані
+# Restore data
 Copy-Item "$env:USERPROFILE\Desktop\BIZFLOW_Backup_2026-05-12.db" `
           "$env:LOCALAPPDATA\BIZFLOW\bizflow.db" -Force
 ```
 
 ---
 
-## 🔄 Міграція даних
+## Data Migration
 
-### При оновленні програми:
+### When updating the program:
 
-Міграції застосовуються **автоматично** при запуску для кожного користувача окремо.
+Migrations applied automatically on startup for each user separately.
 
 ```
-Користувач 1 запускає → міграції застосовуються до його бази
-Користувач 2 запускає → міграції застосовуються до його бази
-```
-
----
-
-## ⚠️ Важливо знати
-
-### ✅ Переваги:
-- ✅ Повна ізоляція даних між користувачами Windows
-- ✅ Кожен може мати свої облікові записи
-- ✅ Не потрібно виходити з BIZFLOW при зміні користувача Windows
-- ✅ Просте резервне копіювання (просто файл)
-
-### ⚠️ Обмеження:
-- ⚠️ Користувачі Windows **не бачать** дані один одного
-- ⚠️ Для спільної роботи потрібна **мережева** база даних (SQL Server, PostgreSQL)
-- ⚠️ Резервні копії треба робити **для кожного користувача окремо**
-
----
-
-## 🤝 Спільна робота (майбутнє)
-
-Якщо потрібно щоб **кілька людей працювали з одними даними**:
-
-### Варіант 1: Одне облікове запис Windows
-```
-Всі входять під одним Windows user → бачать одні дані
-```
-
-### Варіант 2: Мережева база даних (потребує розробки)
-```
-SQL Server / PostgreSQL → всі підключаються до однієї бази
+User 1 starts -> migrations applied to his database
+User 2 starts -> migrations applied to his database
 ```
 
 ---
 
-## 📝 Технічні деталі
+## Important to Know
 
-### Код визначення шляху:
+### Advantages:
+- Complete data isolation between Windows users
+- Each can have own accounts
+- No need to logout from BIZFLOW when changing Windows user
+- Simple backup (just a file)
+
+### Limitations:
+- Windows users cannot see each other's data
+- For shared work need network database (SQL Server, PostgreSQL)
+- Backups must be made for each user separately
+
+---
+
+## Shared Work (future)
+
+If need multiple people working with same data:
+
+### Option 1: One Windows Account
+```
+All login under one Windows user -> see same data
+```
+
+### Option 2: Network Database (requires development)
+```
+SQL Server / PostgreSQL -> all connect to one database
+```
+
+---
+
+## Technical Details
+
+### Path determination code:
 ```csharp
 static string GetUserDataPath()
 {
@@ -216,12 +216,12 @@ var connectionString = $"Data Source={dbPath}";
 
 ---
 
-## 🎉 Готово!
+## Done!
 
-Тепер кожен користувач Windows має:
-- ✅ Свою окрему базу даних
-- ✅ Свої облікові записи BIZFLOW
-- ✅ Свої товари та операції
-- ✅ Повну ізоляцію від інших користувачів
+Now each Windows user has:
+- Own separate database
+- Own BIZFLOW accounts
+- Own products and operations
+- Complete isolation from other users
 
-**Запустіть BIZFLOW під своїм обліковим записом Windows і створіть свого користувача!**
+Run BIZFLOW under your Windows account and create your user!

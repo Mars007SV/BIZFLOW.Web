@@ -4,16 +4,19 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BIZFLOW.Web.Controllers
 {
+    // Controller for user authentication (login, register, logout)
     public class AccountController : Controller
     {
         private readonly IAuthService _authService;
 
+        // Constructor with authentication service injection
         public AccountController(IAuthService authService)
         {
             _authService = authService;
         }
 
         // GET: Account/Login
+        // Display login form
         [HttpGet]
         public IActionResult Login()
         {
@@ -21,6 +24,7 @@ namespace BIZFLOW.Web.Controllers
         }
 
         // POST: Account/Login
+        // Process login form submission
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel model)
@@ -30,15 +34,16 @@ namespace BIZFLOW.Web.Controllers
                 return View(model);
             }
 
+            // Attempt to login with provided credentials
             var user = await _authService.LoginAsync(model.UserName, model.Password);
 
             if (user == null)
             {
-                ModelState.AddModelError("", "Неправильне ім'я користувача або пароль");
+                ModelState.AddModelError("", "Incorrect username or password");
                 return View(model);
             }
 
-            // Зберігаємо ID користувача в сесії
+            // Save user ID in session for authentication
             HttpContext.Session.SetString("UserId", user.Id.ToString());
             HttpContext.Session.SetString("UserName", user.UserName);
 
@@ -46,6 +51,7 @@ namespace BIZFLOW.Web.Controllers
         }
 
         // GET: Account/Register
+        // Display registration form
         [HttpGet]
         public IActionResult Register()
         {
@@ -53,6 +59,7 @@ namespace BIZFLOW.Web.Controllers
         }
 
         // POST: Account/Register
+        // Process registration form submission
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterViewModel model)
@@ -62,6 +69,7 @@ namespace BIZFLOW.Web.Controllers
                 return View(model);
             }
 
+            // Try to register new user
             var result = await _authService.RegisterAsync(model.UserName, model.Password, model.FullName);
 
             if (!result.Success)
@@ -70,7 +78,7 @@ namespace BIZFLOW.Web.Controllers
                 return View(model);
             }
 
-            // Автоматично входимо після реєстрації
+            // Automatically login after successful registration
             var user = await _authService.LoginAsync(model.UserName, model.Password);
             if (user != null)
             {
@@ -82,6 +90,7 @@ namespace BIZFLOW.Web.Controllers
         }
 
         // GET: Account/Logout
+        // Handle user logout
         public async Task<IActionResult> Logout()
         {
             await _authService.LogoutAsync(HttpContext);

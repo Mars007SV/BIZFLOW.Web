@@ -2,27 +2,34 @@ using System.ComponentModel.DataAnnotations;
 
 namespace BIZFLOW.Web.Models
 {
+    // Product model represents items in warehouse inventory
     public class Product
     {
-        public int Id { get; set; } // Primary key
+        // Unique identifier for product
+        public int Id { get; set; }
 
+        // Product name (required field)
         [Required]
-        [Display(Name = "Назва")]
-        public string Name { get; set; } = string.Empty; // Product name
+        [Display(Name = "Name")]
+        public string Name { get; set; } = string.Empty;
 
+        // Current quantity available in stock
         [Required]
-        [Display(Name = "Кількість")]
-        [Range(0, double.MaxValue, ErrorMessage = "Кількість повинна бути більше або дорівнювати 0")]
-        public decimal Quantity { get; set; } // Current quantity in stock
+        [Display(Name = "Quantity")]
+        [Range(0, double.MaxValue, ErrorMessage = "Quantity must be greater than or equal to 0")]
+        public decimal Quantity { get; set; }
 
+        // Unit of measure (pieces, kg, liters, etc.)
         [Required]
-        [Display(Name = "Одиниця виміру")]
-        public UnitOfMeasure UnitOfMeasure { get; set; } = UnitOfMeasure.Pieces; // Unit of measure (pieces, kg, liters)
+        [Display(Name = "Unit of Measure")]
+        public UnitOfMeasure UnitOfMeasure { get; set; } = UnitOfMeasure.Pieces;
 
+        // Foreign key linking to category
         [Required]
-        [Display(Name = "Категорія")]
-        public int CategoryId { get; set; } // Foreign key to Category
+        [Display(Name = "Category")]
+        public int CategoryId { get; set; }
 
-        public Category? Category { get; set; } // Navigation property to related Category
+        // Navigation property to access related category
+        public Category? Category { get; set; }
     }
 }
