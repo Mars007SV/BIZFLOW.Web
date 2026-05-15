@@ -1,103 +1,93 @@
-# 🔧 Технічні деталі системи авторизації
+# Technical Details of Authentication System
 
-## Архітектура
+## Architecture
 
 ```
-┌─────────────────┐
-│   Користувач    │
-└────────┬────────┘
-         │
-         ▼
-┌─────────────────────────┐
-│  AuthenticationMiddleware│ ◄── Перевіряє сесію
-└────────┬────────────────┘
-         │
-         ▼
-┌─────────────────────────┐
-│   AccountController     │ ◄── Login/Register/Logout
-└────────┬────────────────┘
-         │
-         ▼
-┌─────────────────────────┐
-│     AuthService         │ ◄── Бізнес-логіка авторизації
-└────────┬────────────────┘
-         │
-         ▼
-┌─────────────────────────┐
-│   BizFlowDbContext      │ ◄── База даних (SQLite)
-└─────────────────────────┘
+User
+  |
+  v
+AuthenticationMiddleware  <-- Checks session
+  |
+  v
+AccountController  <-- Login/Register/Logout
+  |
+  v
+AuthService  <-- Authentication business logic
+  |
+  v
+BizFlowDbContext  <-- Database (SQLite)
 ```
 
-## Компоненти системи
+## System Components
 
 ### 1. Models
-- **User.cs** - модель користувача
-- **AuthViewModels.cs** - ViewModels для форм входу та реєстрації
+- User.cs - user model
+- AuthViewModels.cs - ViewModels for login and registration forms
 
 ### 2. Services
-- **IAuthService / AuthService** - сервіс авторизації
-  - `LoginAsync()` - вхід користувача
-  - `RegisterAsync()` - реєстрація нового користувача
-  - `GetCurrentUserAsync()` - отримання поточного користувача з сесії
-  - `LogoutAsync()` - вихід з системи
-  - `HashPassword()` - хешування пароля (SHA256)
-  - `VerifyPassword()` - перевірка пароля
+- IAuthService / AuthService - authentication service
+  - LoginAsync() - user login
+  - RegisterAsync() - register new user
+  - GetCurrentUserAsync() - get current user from session
+  - LogoutAsync() - logout
+  - HashPassword() - password hashing (SHA256)
+  - VerifyPassword() - password verification
 
 ### 3. Middleware
-- **AuthenticationMiddleware** - перехоплює всі запити та перевіряє авторизацію
-  - Публічні шляхи: `/account/*`, статичні файли
-  - Захищені шляхи: всі інші
+- AuthenticationMiddleware - intercepts all requests and checks authorization
+  - Public paths: /account/*, static files
+  - Protected paths: all others
 
 ### 4. Controllers
-- **AccountController** - управління обліковими записами
-  - `GET /Account/Login` - форма входу
-  - `POST /Account/Login` - обробка входу
-  - `GET /Account/Register` - форма реєстрації
-  - `POST /Account/Register` - обробка реєстрації
-  - `GET /Account/Logout` - вихід
+- AccountController - account management
+  - GET /Account/Login - login form
+  - POST /Account/Login - login processing
+  - GET /Account/Register - registration form
+  - POST /Account/Register - registration processing
+  - GET /Account/Logout - logout
 
-- **UserController** - управління профілем
-  - `GET /User/Profile` - профіль користувача
-  - `POST /User/UpdateProfile` - оновлення профілю
-  - `GET /User/Index` - список користувачів
-  - `GET /User/GetCurrentUser` - API для отримання даних
+- UserController - profile management
+  - GET /User/Profile - user profile
+  - POST /User/UpdateProfile - profile update
+  - GET /User/Index - user list
+  - GET /User/GetCurrentUser - API for data retrieval
 
 ### 5. Views
-- **Views/Account/Login.cshtml** - сторінка входу
-- **Views/Account/Register.cshtml** - сторінка реєстрації
-- **Views/User/Profile.cshtml** - сторінка профілю
-- **Views/User/Index.cshtml** - список користувачів
+- Views/Account/Login.cshtml - login page
+- Views/Account/Register.cshtml - registration page
+- Views/User/Profile.cshtml - profile page
+- Views/User/Index.cshtml - user list
 
-## База даних
+## Database
 
-### Таблиця Users
+### Users Table
 
-| Поле | Тип | Опис |
-|------|-----|------|
-| Id | INTEGER | Primary Key, Auto Increment |
-| UserName | TEXT(50) | Унікальне ім'я користувача |
-| PasswordHash | TEXT(255) | Хеш паролю (SHA256) |
-| FullName | TEXT(100) | Повне ім'я (nullable) |
-| CreatedAt | TEXT | Дата створення |
-| LastAccessAt | TEXT | Останній вхід |
-| IsActive | INTEGER | Активний/неактивний (boolean) |
-| Preferences | TEXT | JSON з налаштуваннями (nullable) |
+Field | Type | Description
+------|------|------------
+Id | INTEGER | Primary Key, Auto Increment
+UserName | TEXT(50) | Unique username
+PasswordHash | TEXT(255) | Password hash (SHA256)
+FullName | TEXT(100) | Full name (nullable)
+CreatedAt | TEXT | Creation date
+LastAccessAt | TEXT | Last login
+IsActive | INTEGER | Active/inactive (boolean)
+Preferences | TEXT | JSON with settings (nullable)
 
-**Індекси:**
-- UNIQUE INDEX на `UserName`
+Indexes:
+- UNIQUE INDEX on UserName
 
-## Потік авторизації
+## Authorization Flow
 
-### Реєстрація
+### Registration
 ```
-1. Користувач заповнює форму реєстрації
+1. User fills registration form
 2. POST /Account/Register
-3. Валідація даних (ModelState)
-4. Перевірка унікальності UserName
-5. Хешування пароля (SHA256)
-6. Збереження в БД
-7. Автоматичний вхід
-8. Створення сесії (UserId в Session)
+3. Data validation (ModelState)
+4. Check UserName uniqueness
+5. Password hashing (SHA256)
+6. Save to DB
+7. Automatic login
+8. Session creation (UserId in Session)
 9. Redirect на Home/Index
 ```
 
@@ -107,42 +97,40 @@
 2. POST /Account/Login
 3. Пошук користувача в БД за UserName
 4. Перевірка пароля (VerifyPassword)
-5. Оновлення LastAccessAt
-6. Створення сесії (UserId в Session)
-7. Redirect на Home/Index
+9. Redirect to Home/Index
 ```
 
-### Перевірка авторизації (Middleware)
+### Authorization Check (Middleware)
 ```
-1. Кожен запит → AuthenticationMiddleware
-2. Перевірка чи публічний шлях? 
-   - Так → пропустити
-   - Ні → перевірити сесію
+1. Each request -> AuthenticationMiddleware
+2. Check if public path?
+   - Yes -> pass through
+   - No -> check session
 3. GetCurrentUserAsync(HttpContext)
-4. Користувач знайдений?
-   - Так → продовжити запит
-   - Ні → Redirect на /Account/Login
+4. User found?
+   - Yes -> continue request
+   - No -> Redirect to /Account/Login
 ```
 
-## Сесії
+## Sessions
 
-Налаштування в Program.cs:
+Configuration in Program.cs:
 ```csharp
 builder.Services.AddSession(options =>
 {
-    options.IdleTimeout = TimeSpan.FromHours(24);  // 24 години
-    options.Cookie.HttpOnly = true;                // Захист від XSS
-    options.Cookie.IsEssential = true;             // Необхідна cookie
+    options.IdleTimeout = TimeSpan.FromHours(24);  // 24 hours
+    options.Cookie.HttpOnly = true;                // XSS protection
+    options.Cookie.IsEssential = true;             // Essential cookie
 });
 ```
 
-Дані в сесії:
-- `UserId` - ID поточного користувача
-- `UserName` - ім'я користувача
+Session data:
+- UserId - current user ID
+- UserName - username
 
-## Безпека
+## Security
 
-### Хешування паролів
+### Password Hashing
 ```csharp
 public string HashPassword(string password)
 {
@@ -152,19 +140,19 @@ public string HashPassword(string password)
 }
 ```
 
-### Валідація
-- **UserName**: 3-50 символів
-- **Password**: мінімум 6 символів
-- **ConfirmPassword**: має співпадати з Password
+### Validation
+- UserName: 3-50 characters
+- Password: minimum 6 characters
+- ConfirmPassword: must match Password
 
-### Захист від атак
-- ✅ SQL Injection - Entity Framework параметризація
-- ✅ XSS - HttpOnly cookies
-- ✅ CSRF - ValidateAntiForgeryToken на формах
+### Attack Protection
+- SQL Injection - Entity Framework parameterization
+- XSS - HttpOnly cookies
+- CSRF - ValidateAntiForgeryToken on forms
 
-## Розширення
+## Extensions
 
-### Додавання ролей
+### Adding Roles
 ```csharp
 public class User
 {
@@ -173,7 +161,7 @@ public class User
 }
 ```
 
-### Додавання Email
+### Adding Email
 ```csharp
 public class User
 {
@@ -183,7 +171,7 @@ public class User
 }
 ```
 
-### Двофакторна автентифікація
+### Two-Factor Authentication
 ```csharp
 public class User
 {
@@ -193,28 +181,28 @@ public class User
 }
 ```
 
-## Міграції
+## Migrations
 
 ```bash
-# Створення міграції
+# Create migration
 dotnet ef migrations add UpdateUserTableForAuthentication
 
-# Застосування до БД
+# Apply to DB
 dotnet ef database update
 
-# Відкат останньої міграції
+# Rollback last migration
 dotnet ef migrations remove
 ```
 
-## Тестування
+## Testing
 
-### Створення тестового користувача
+### Create test user
 ```csharp
 var authService = serviceProvider.GetService<IAuthService>();
 await authService.RegisterAsync("admin", "admin123", "Administrator");
 ```
 
-### Перевірка входу
+### Login check
 ```csharp
 var user = await authService.LoginAsync("admin", "admin123");
 Assert.NotNull(user);
@@ -222,17 +210,17 @@ Assert.NotNull(user);
 
 ## Performance
 
-- Використовується in-memory cache для сесій
-- Індекс на UserName для швидкого пошуку
-- SHA256 - баланс між безпекою та продуктивністю
+- Uses in-memory cache for sessions
+- Index on UserName for fast lookup
+- SHA256 - balance between security and performance
 
-## TODO / Покращення
+## TODO / Improvements
 
-- [ ] Email verification
-- [ ] Password reset functionality
-- [ ] Remember me functionality (persistent cookies)
-- [ ] Account lockout after failed attempts
-- [ ] Password strength meter
-- [ ] Social login (Google, Facebook)
-- [ ] Role-based authorization
-- [ ] Activity log
+- Email verification
+- Password reset functionality
+- Remember me functionality (persistent cookies)
+- Account lockout after failed attempts
+- Password strength meter
+- Social login (Google, Facebook)
+- Role-based authorization
+- Activity log

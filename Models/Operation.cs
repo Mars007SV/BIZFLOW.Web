@@ -3,38 +3,48 @@ using System.ComponentModel.DataAnnotations;
 
 namespace BIZFLOW.Web.Models
 {
+    // Operation model tracks all product movements (incoming/outgoing)
     public class Operation
     {
-        public int Id { get; set; } // Primary key
+        // Unique identifier
+        public int Id { get; set; }
 
+        // Foreign key to product
         [Required]
-        [Display(Name = "Продукт")]
-        public int ProductId { get; set; } // Foreign key to Product
+        [Display(Name = "Product")]
+        public int ProductId { get; set; }
 
-        public Product? Product { get; set; } // Navigation property to related Product
+        // Navigation property to related product
+        public Product? Product { get; set; }
 
+        // Quantity involved in this operation
         [Required]
-        [Display(Name = "Кількість")]
-        [Range(0.001, double.MaxValue, ErrorMessage = "Кількість повинна бути більше 0")]
-        public decimal Quantity { get; set; } // Quantity of the operation
+        [Display(Name = "Quantity")]
+        [Range(0.001, double.MaxValue, ErrorMessage = "Quantity must be greater than 0")]
+        public decimal Quantity { get; set; }
 
+        // Type of operation (Incoming/Outgoing)
         [Required]
-        [Display(Name = "Тип операції")]
-        public string Type { get; set; } = string.Empty; // Incoming / Outgoing
+        [Display(Name = "Operation Type")]
+        public string Type { get; set; } = string.Empty;
 
+        // Date when operation was performed
         [Required]
-        [Display(Name = "Дата операції")]
-        public DateTime Date { get; set; } // Date of the operation
+        [Display(Name = "Operation Date")]
+        public DateTime Date { get; set; }
 
-        [Display(Name = "Опис")]
-        [StringLength(500, ErrorMessage = "Опис не може перевищувати 500 символів")]
-        public string? Description { get; set; } // Description of the operation
+        // Optional description of the operation
+        [Display(Name = "Description")]
+        [StringLength(500, ErrorMessage = "Description cannot exceed 500 characters")]
+        public string? Description { get; set; }
 
-        [Display(Name = "Користувач")]
+        // User who performed the operation
+        [Display(Name = "User")]
         [StringLength(100)]
-        public string? UserName { get; set; } // User who performed the operation
+        public string? UserName { get; set; }
 
-        [Display(Name = "Залишок після операції")]
-        public decimal RemainingQuantity { get; set; } // Product quantity after operation
+        // Product quantity remaining after this operation
+        [Display(Name = "Remaining Quantity")]
+        public decimal RemainingQuantity { get; set; }
     }
 }

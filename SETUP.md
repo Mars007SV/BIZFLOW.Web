@@ -1,153 +1,153 @@
-# 🚀 BIZFLOW - Installation & Deployment Guide
+# BIZFLOW - Інструкція з встановлення та розгортання
 
-## 📋 Table of Contents
-- [Quick Start for Users](#quick-start-for-users)
-- [Installation](#installation)
-- [Development Setup](#development-setup)
-- [Building for Production](#building-for-production)
-- [Deployment](#deployment)
-
----
-
-## 🎯 Quick Start for Users
-
-### Running Installed Application
-After installation, simply run `BIZFLOW.exe` - the browser will open automatically at `http://localhost:5555`
-
-### First Time Setup
-1. Launch the application
-2. Click **"Sign Up"** on the login page
-3. Enter username (3-50 characters)
-4. Create password (minimum 6 characters)
-5. Done! Start managing your inventory
-
-### Data Storage
-Your database is stored at:
-```
-C:\Users\[YourName]\AppData\Local\BIZFLOW\bizflow.db
-```
-
-Each Windows user has their own separate database.
+## Зміст
+- Швидкий старт для користувачів
+- Встановлення
+- Налаштування для розробки
+- Збірка для продакшн
+- Розгортання
 
 ---
 
-## 📦 Installation
+## Швидкий старт для користувачів
 
-### For End Users (Windows)
+### Запуск встановленого додатку
+Після встановлення просто запустіть BIZFLOW.exe - браузер відкриється автоматично за адресою http://localhost:5555
 
-#### Option 1: Run from Published Build
-1. Download the `BIZFLOW-Windows` folder
-2. Run `BIZFLOW.exe`
-3. Browser opens automatically
+### Налаштування при першому запуску
+1. Запустіть додаток
+2. Натисніть "Зареєструватися" на сторінці входу
+3. Введіть ім'я користувача (3-50 символів)
+4. Створіть пароль (мінімум 6 символів)
+5. Готово! Почніть управляти своїм складом
 
-#### Option 2: Build from Source
+### Зберігання даних
+Ваша база даних зберігається за адресою:
+```
+C:\Users\[ВашеІм'я]\AppData\Local\BIZFLOW\bizflow.db
+```
+
+Кожен користувач Windows має власну окрему базу даних.
+
+---
+
+## Встановлення
+
+### Для кінцевих користувачів (Windows)
+
+#### Варіант 1: Запуск з готової збірки
+1. Завантажте папку BIZFLOW-Windows
+2. Запустіть BIZFLOW.exe
+3. Браузер відкриється автоматично
+
+#### Варіант 2: Збірка з вихідного коду
 ```bash
-# Clone the repository
+# Клонуйте репозиторій
 git clone https://github.com/Mars007SV/BIZFLOW.Web.git
 cd BIZFLOW.Web
 
-# Run the publish script
+# Запустіть скрипт публікації
 PUBLISH-DESKTOP.bat
 
-# Find your executable at:
+# Знайдіть виконуваний файл за адресою:
 # publish\BIZFLOW-Windows\BIZFLOW.exe
 ```
 
 ---
 
-## 🛠️ Development Setup
+## Налаштування для розробки
 
-### Prerequisites
+### Необхідні компоненти
 - .NET 10 SDK
-- Visual Studio 2026 (or VS Code)
+- Visual Studio 2026 або VS Code
 - Git
 
-### 1. Clone Repository
+### 1. Клонування репозиторію
 ```bash
 git clone https://github.com/Mars007SV/BIZFLOW.Web.git
 cd BIZFLOW.Web
 ```
 
-### 2. Restore Dependencies
+### 2. Відновлення залежностей
 ```bash
 dotnet restore
 ```
 
-### 3. Run Development Server
+### 3. Запуск сервера розробки
 
-#### Option A: Simple Run (Windows)
+#### Варіант A: Простий запуск (Windows)
 ```bash
 START-BIZFLOW.bat
 ```
-- Starts server on `http://localhost:5555`
-- Opens browser automatically
-- Press any key to stop
+- Запускає сервер на http://localhost:5555
+- Відкриває браузер автоматично
+- Натисніть будь-яку клавішу для зупинки
 
-#### Option B: With Electron Desktop (Development)
+#### Варіант B: З Electron Desktop (розробка)
 ```bash
 START-ELECTRON.bat
 ```
-- Starts Electron desktop app
-- First run: Downloads Electron (~150MB, 2-5 minutes)
-- Next runs: 20-30 seconds
+- Запускає Electron desktop додаток
+- Перший запуск: Завантажує Electron (близько 150МБ, 2-5 хвилин)
+- Наступні запуски: 20-30 секунд
 
-#### Option C: Manual
+#### Варіант C: Вручну
 ```bash
 dotnet run --launch-profile BIZFLOW
 ```
 
-### 4. Default Configuration
-- **Development URL:** `http://localhost:5555`
-- **Production URL:** `http://localhost:5000`
-- **Database:** SQLite (auto-created on first run)
+### 4. Налаштування за замовчуванням
+- URL для розробки: http://localhost:5555
+- URL для продакшн: http://localhost:5000
+- База даних: SQLite (автоматично створюється при першому запуску)
 
 ---
 
-## 📦 Building for Production
+## Збірка для продакшн
 
-### Windows Desktop Application
+### Десктопний додаток Windows
 
-#### Full Build Script (Recommended)
+#### Повний скрипт збірки (рекомендується)
 ```bash
 PUBLISH-DESKTOP.bat
 ```
 
-This creates:
-- Self-contained executable
-- Single file deployment
-- All dependencies included
-- Output: `publish\BIZFLOW-Windows\BIZFLOW.exe`
+Це створює:
+- Самодостатній виконуваний файл
+- Розгортання одного файлу
+- Усі залежності включені
+- Вихід: publish\BIZFLOW-Windows\BIZFLOW.exe
 
-#### Manual Build
+#### Збірка вручну
 ```bash
 dotnet publish -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o publish/BIZFLOW-Windows
 ```
 
-### Build Options Explained
-- `-c Release` - Optimized production build
-- `-r win-x64` - Windows 64-bit target
-- `--self-contained true` - Includes .NET runtime
-- `-p:PublishSingleFile=true` - Single EXE file
-- `-o publish/BIZFLOW-Windows` - Output directory
+### Пояснення параметрів збірки
+- -c Release - Оптимізована продакшн збірка
+- -r win-x64 - Цільова платформа Windows 64-біт
+- --self-contained true - Включає .NET runtime
+- -p:PublishSingleFile=true - Один EXE файл
+- -o publish/BIZFLOW-Windows - Папка для виходу
 
-### File Size
-- Built application: ~80-100 MB
-- Includes .NET 10 runtime and all dependencies
+### Розмір файлів
+- Зібраний додаток: 80-100 МБ
+- Включає .NET 10 runtime та всі залежності
 
 ---
 
-## 🌐 Deployment
+## Розгортання
 
-### Local Deployment (Single PC)
+### Локальне розгортання (Один ПК)
 
-#### Deploy Published Build
-1. Run `PUBLISH-DESKTOP.bat`
-2. Copy entire `publish\BIZFLOW-Windows` folder
-3. Place on target PC
-4. Run `BIZFLOW.exe`
-5. Browser opens automatically
+#### Розгортання зібраної версії
+1. Запустіть PUBLISH-DESKTOP.bat
+2. Скопіюйте всю папку publish\BIZFLOW-Windows
+3. Помістіть на цільовий ПК
+4. Запустіть BIZFLOW.exe
+5. Браузер відкривається автоматично
 
-#### What Gets Deployed
+#### Що розгортається
 ```
 BIZFLOW-Windows/
 ├── BIZFLOW.exe          # Main executable
@@ -163,7 +163,7 @@ Each Windows user automatically gets:
 - Own database in their AppData folder
 - Independent inventory data
 
-**No additional setup required!**
+No additional setup required.
 
 ### Network Deployment (Multiple PCs)
 
@@ -175,15 +175,15 @@ Each Windows user automatically gets:
 #### Option 2: Shared Database (Advanced)
 For shared database across network:
 1. Set up SQL Server or PostgreSQL
-2. Update `appsettings.json` connection string
+2. Update appsettings.json connection string
 3. Run migrations on shared database
 4. Deploy application to all PCs
 
-**Note:** Default SQLite setup doesn't support network sharing.
+Note: Default SQLite setup doesn't support network sharing.
 
 ---
 
-## 🔧 Configuration
+## Configuration
 
 ### appsettings.json
 ```json
@@ -200,17 +200,17 @@ For shared database across network:
 ```
 
 ### Environment Variables
-- `ASPNETCORE_ENVIRONMENT` - Set to `Production` or `Development`
-- `ASPNETCORE_URLS` - Override listening ports
+- ASPNETCORE_ENVIRONMENT - Set to Production or Development
+- ASPNETCORE_URLS - Override listening ports
 
 ### Launch Profiles (Properties/launchSettings.json)
-- `http` - Development (port 5129)
-- `https` - Development with SSL (port 7293)
-- `BIZFLOW` - Custom profile (port 5555, auto-launch browser)
+- http - Development (port 5129)
+- https - Development with SSL (port 7293)
+- BIZFLOW - Custom profile (port 5555, auto-launch browser)
 
 ---
 
-## 🧪 Testing Deployment
+## Testing Deployment
 
 ### Test Published Build Locally
 ```bash
@@ -219,15 +219,15 @@ BIZFLOW.exe
 ```
 
 ### Verify
-1. ✅ Application starts
-2. ✅ Browser opens automatically
-3. ✅ Login page appears
-4. ✅ Can create user account
-5. ✅ Dashboard loads after login
+1. Application starts
+2. Browser opens automatically
+3. Login page appears
+4. Can create user account
+5. Dashboard loads after login
 
 ---
 
-## 📊 Database Management
+## Database Management
 
 ### Location
 ```
@@ -235,7 +235,7 @@ C:\Users\[Username]\AppData\Local\BIZFLOW\bizflow.db
 ```
 
 ### Backup
-Copy the entire `BIZFLOW` folder:
+Copy the entire BIZFLOW folder:
 ```bash
 xcopy /E /I "C:\Users\%USERNAME%\AppData\Local\BIZFLOW" "D:\Backups\BIZFLOW"
 ```
@@ -254,7 +254,7 @@ rmdir /S /Q "C:\Users\%USERNAME%\AppData\Local\BIZFLOW"
 
 ---
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### Application Won't Start
 1. Check if port 5000 is available:
@@ -266,7 +266,7 @@ rmdir /S /Q "C:\Users\%USERNAME%\AppData\Local\BIZFLOW"
 
 ### Browser Doesn't Open
 - Application still starts successfully
-- Manually open: `http://localhost:5000`
+- Manually open: http://localhost:5000
 - Check console output for actual port
 
 ### Database Errors
@@ -284,11 +284,11 @@ dotnet build
 
 ---
 
-## 📞 Support & Documentation
+## Support and Documentation
 
 ### Project Links
-- **Repository:** https://github.com/Mars007SV/BIZFLOW.Web
-- **Issues:** https://github.com/Mars007SV/BIZFLOW.Web/issues
+- Repository: https://github.com/Mars007SV/BIZFLOW.Web
+- Issues: https://github.com/Mars007SV/BIZFLOW.Web/issues
 
 ### Additional Documentation
 - User authentication system: Built-in login/signup
@@ -297,12 +297,12 @@ dotnet build
 
 ---
 
-## 🔄 Git Workflow
+## Git Workflow
 
 ### Branches
-- `main` - Stable production releases
-- `develop` - Integration branch for features
-- `feature/*` - Feature development branches
+- main - Stable production releases
+- develop - Integration branch for features
+- feature/* - Feature development branches
 
 ### For Developers
 ```bash
@@ -321,19 +321,19 @@ git merge feature/your-feature-name
 
 ---
 
-## ✨ Features
+## Features
 
-- ✅ Inventory management (add, edit, delete products)
-- ✅ Category organization
-- ✅ Operations history with full audit trail
-- ✅ User authentication and authorization
-- ✅ Multi-user support (separate databases per Windows user)
-- ✅ Offline-first design
-- ✅ Auto-open browser on launch
-- ✅ Cross-platform ready (Windows, macOS, Linux)
+- Inventory management (add, edit, delete products)
+- Category organization
+- Operations history with full audit trail
+- User authentication and authorization
+- Multi-user support (separate databases per Windows user)
+- Offline-first design
+- Auto-open browser on launch
+- Cross-platform ready (Windows, macOS, Linux)
 
 ---
 
-**Last Updated:** 2025  
-**Version:** 1.0  
-**License:** MIT
+Last Updated: 2025
+Version: 1.0
+License: MIT

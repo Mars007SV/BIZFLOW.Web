@@ -10,23 +10,46 @@ using BIZFLOW.Web.Models;
 
 namespace BIZFLOW.Web.Controllers
 {
+    // Controller for managing products in the warehouse
     public class ProductsController : Controller
     {
         private readonly BizFlowDbContext _context;
 
+        // Constructor with dependency injection of database context
         public ProductsController(BizFlowDbContext context)
         {
             _context = context;
         }
 
         // GET: Products
-        public async Task<IActionResult> Index()
+        // Display list of products with search and filter functionality
+        public async Task<IActionResult> Index(string searchString, int? categoryFilter)
         {
-            var bizFlowDbContext = _context.Products.Include(p => p.Category);
-            return View(await bizFlowDbContext.ToListAsync());
+            // Get all products with their categories
+            var products = _context.Products.Include(p => p.Category).AsQueryable();
+
+            // Search by product name
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                products = products.Where(p => p.Name.Contains(searchString));
+            }
+
+            // Filter by category
+            if (categoryFilter.HasValue && categoryFilter.Value > 0)
+            {
+                products = products.Where(p => p.CategoryId == categoryFilter.Value);
+            }
+
+            // Pass category list for dropdown menu
+            ViewData["Categories"] = new SelectList(await _context.Categories.ToListAsync(), "Id", "Name");
+            ViewData["CurrentSearch"] = searchString;
+            ViewData["CurrentCategory"] = categoryFilter;
+
+            return View(await products.ToListAsync());
         }
 
         // GET: Products/Details/5
+        // Show detailed information about specific product
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -46,30 +69,34 @@ namespace BIZFLOW.Web.Controllers
         }
 
         // GET: Products/Create
+        // Display form for creating new product
         public IActionResult Create()
         {
+            // Populate category dropdown list
             ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name");
             return View();
         }
 
         // POST: Products/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        // Handle form submission for creating new product
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Name,Quantity,UnitOfMeasure,CategoryId")] Product product)
         {
             if (ModelState.IsValid)
             {
+                // Add product to database
                 _context.Add(product);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+            // If validation fails, reload category list
             ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name", product.CategoryId);
             return View(product);
         }
 
         // GET: Products/Edit/5
+        // Display form for editing existing product
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)

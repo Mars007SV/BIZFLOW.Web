@@ -3,13 +3,17 @@ using System.ComponentModel.DataAnnotations;
 
 namespace BIZFLOW.Web.Models
 {
+    // Category model for organizing products into groups
     public class Category
     {
-        public int Id { get; set; } // Primary key
+        // Unique identifier
+        public int Id { get; set; }
 
+        // Category name (required)
         [Required]
-        public string Name { get; set; } // Category name
+        public string Name { get; set; }
 
-        public List<Product>? Products { get; set; } // Navigation property to related products
+        // Collection of products in this category
+        public List<Product>? Products { get; set; }
     }
 }
