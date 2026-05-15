@@ -1,171 +1,448 @@
-# BIZFLOW - Inventory Management System
+# BIZFLOW - Система Управління Складом
 
-## 🎯 About
+> 🎓 **Дипломний проєкт** - професійна система обліку товарів з багатокористувацькою підтримкою
 
-BIZFLOW is a professional inventory management system that allows you to:
-- ✅ Track product stock levels
-- ✅ Organize products by categories
-- ✅ Maintain detailed operation history with full audit trail
-- ✅ Work locally on your computer
-- 🔐 **Secure user authentication and authorization**
-- 👥 **Separate database for each Windows user**
+## 🎯 Про Проєкт
 
-## 🚀 Quick Start
+BIZFLOW - це локальна десктопна система управління товарно-матеріальними цінностями, розроблена на базі сучасних веб-технологій. Система забезпечує повний контроль над складським обліком з можливістю роботи декількох користувачів на одному комп'ютері.
 
-### For Users
+### Основні можливості:
+- ✅ Облік товарів та залишків на складі
+- ✅ Організація товарів за категоріями
+- ✅ Детальна історія всіх операцій з аудитом змін
+- ✅ Локальна робота без потреби в інтернеті
+- 🔐 Безпечна аутентифікація та авторизація
+- 👥 Окрема база даних для кожного користувача Windows
+- 📊 Генерація звітів у форматі Excel
+
+---
+
+## 🚀 Швидкий Старт
+
+### Для Користувачів
 ```bash
-# Download and run
+# Завантажте та запустіть
 BIZFLOW.exe
 ```
-Browser opens automatically at `http://localhost:5555`
+Браузер відкриється автоматично за адресою `http://localhost:5555`
 
-### For Developers
+### Для Розробників
 ```bash
-# Clone repository
+# Клонувати репозиторій
 git clone https://github.com/Mars007SV/BIZFLOW.Web.git
 cd BIZFLOW.Web
 
-# Run development server
+# Запустити сервер розробки
 START-BIZFLOW.bat
 ```
 
-**📖 Full Installation & Deployment Guide:** [SETUP.md](SETUP.md)
+**📖 Повна Інструкція:** [SETUP.md](SETUP.md)
 
 ---
 
-## 👥 Multi-User System
+## 👥 Багатокористувацька Система
 
-**Each Windows user has their own data!**
+**Кожен користувач Windows має власні дані!**
 
 ```
-🖥️ One Computer
-   ├── 👤 User 1 → Own database
-   ├── 👤 User 2 → Own database
-   └── 👤 User 3 → Own database
+🖥️ Один Комп'ютер
+   ├── 👤 Користувач 1 → Власна база даних
+   ├── 👤 Користувач 2 → Власна база даних
+   └── 👤 Користувач 3 → Власна база даних
 ```
 
-**Database location:**
+**Розташування бази даних:**
 ```
-C:\Users\[YourName]\AppData\Local\BIZFLOW\bizflow.db
+C:\Users\[ВашеІм'я]\AppData\Local\BIZFLOW\bizflow.db
 ```
 
----
-
-## 🔐 Authentication
-
-First time setup:
-1. Click **"Sign Up"**
-2. Enter username (3-50 characters)
-3. Create password (minimum 6 characters)
-4. Done! Start using the system
+Це забезпечує повну ізоляцію даних між користувачами та захист конфіденційної інформації.
 
 ---
 
-## 🛠️ Technology Stack
+## 🔐 Аутентифікація
 
-- **Backend:** ASP.NET Core 10 (Razor Pages)
-- **Database:** SQLite with Entity Framework Core 10
-- **Frontend:** Bootstrap 5, HTML5, CSS3, JavaScript
-- **Reports:** ClosedXML (Excel generation)
-- **Security:** SHA256 password hashing, Session-based auth
-- **Desktop:** Electron.NET support ready
+### Перший запуск:
+1. Натисніть **"Реєстрація"**
+2. Введіть ім'я користувача (3-50 символів)
+3. Створіть пароль (мінімум 6 символів)
+4. Готово! Почніть роботу з системою
 
----
-
-## ✨ Features
-
-### 🔐 User Management
-- User registration and login
-- Secure password storage (SHA256)
-- User profile editing
-- Multi-user support with isolated databases
-
-### 📦 Product Management
-- Add, edit, delete products
-- Track stock quantities
-- Category organization
-- Search and filter capabilities
-
-### 📊 Operations History
-- Automatic audit trail for all changes
-- Detailed operation information
-- Track old and new values
-- Full history of inventory movements
-
-### 📈 Reports
-- Excel export functionality
-- Inventory reports
-- Operation history reports
+### Безпека:
+- Паролі зберігаються у вигляді SHA256 хешів
+- Сесійна автентифікація з тривалістю до 24 годин
+- Middleware для автоматичної перевірки авторизації
 
 ---
 
-## 📋 System Requirements
+## 🛠️ Технологічний Стек
 
-- **OS:** Windows 10/11 (x64), macOS, Linux
-- **RAM:** 512 MB minimum
-- **Disk Space:** 150 MB free space
-- **.NET:** .NET 10 Runtime (included in self-contained builds)
+### Backend
+- **Framework:** ASP.NET Core 10
+- **Архітектура:** MVC (Model-View-Controller) з Razor Pages
+- **База даних:** SQLite 
+- **ORM:** Entity Framework Core 10
+
+### Frontend
+- **CSS Framework:** Bootstrap 5
+- **JavaScript:** Vanilla JS + jQuery
+- **Валідація:** jQuery Validation
+
+### Додаткові технології
+- **Звіти:** ClosedXML (генерація Excel-файлів)
+- **Десктоп:** Electron.NET (підтримка нативного застосунку)
+- **Безпека:** SHA256 хешування паролів
 
 ---
 
-## 📦 Project Structure
+## ✨ Функціональні Можливості
+
+### 🔐 Управління Користувачами
+- Реєстрація нових користувачів
+- Вхід в систему з перевіркою облікових даних
+- Редагування профілю користувача
+- Багатокористувацька підтримка з ізольованими базами даних
+
+### 📦 Управління Товарами
+- Додавання, редагування та видалення товарів
+- Відстеження кількості залишків
+- Підтримка одиниць виміру (шт., кг, л, м, упак.)
+- Організація товарів за категоріями
+- Пошук та фільтрація товарів
+
+### 📋 Категорії
+- Створення власних категорій товарів
+- Редагування та видалення категорій
+- Відображення кількості товарів у категорії
+
+### 📊 Історія Операцій
+- Автоматичний аудит всіх змін
+- Детальна інформація про операції (додавання, редагування, видалення)
+- Відстеження старих та нових значень
+- Історія руху товарів по складу
+- Фільтрація історії за товаром
+
+### 📈 Звітність
+- Експорт даних у формат Excel
+- Звіт по залишках товарів
+- Звіт історії операцій
+- Налаштування звітів за періодом та параметрами
+
+---
+
+## 📋 Системні Вимоги
+
+### Мінімальні вимоги:
+- **ОС:** Windows 10/11 (x64), macOS, Linux
+- **Оперативна пам'ять:** 512 МБ
+- **Вільне місце на диску:** 150 МБ
+- **.NET Runtime:** .NET 10 (включено в self-contained збірки)
+
+### Рекомендовані вимоги:
+- **ОС:** Windows 11
+- **Оперативна пам'ять:** 2 ГБ
+- **Процесор:** Intel Core i3 або аналог
+- **Браузер:** Google Chrome, Microsoft Edge, Firefox (остання версія)
+
+---
+
+## 📦 Структура Проєкту
 
 ```
 BIZFLOW.Web/
-├── Controllers/           # MVC controllers
-├── Models/               # Data models
-├── Views/                # Razor views
-├── Data/                 # DbContext and database
-├── Migrations/           # EF Core migrations
-├── Services/             # Business logic services
-├── Middleware/           # Custom middleware
-├── wwwroot/              # Static files (CSS, JS, images)
-├── Properties/           # Launch settings
-├── PUBLISH-DESKTOP.bat   # Build script for production
-├── START-BIZFLOW.bat     # Development quick start
-└── SETUP.md              # Full installation guide
+├── Controllers/              # MVC контролери
+│   ├── AccountController.cs  # Аутентифікація
+│   ├── ProductsController.cs # Управління товарами
+│   ├── CategoriesController.cs
+│   ├── OperationsController.cs
+│   └── UserController.cs     # Профіль користувача
+├── Models/                   # Моделі даних
+│   ├── Product.cs           # Модель товару
+│   ├── Category.cs          # Модель категорії
+│   ├── Operation.cs         # Модель операції
+│   ├── User.cs              # Модель користувача
+│   └── ViewModels/          # View-моделі
+├── Views/                    # Razor представлення
+│   ├── Products/            # Представлення товарів
+│   ├── Categories/          # Представлення категорій
+│   ├── Operations/          # Представлення операцій
+│   ├── Account/             # Вхід/Реєстрація
+│   └── Shared/              # Спільні компоненти
+├── Data/                     # Контекст БД
+│   └── BizFlowDbContext.cs  # EF Core контекст
+├── Migrations/               # EF Core міграції
+├── Services/                 # Бізнес-логіка
+│   ├── AuthService.cs       # Сервіс аутентифікації
+│   └── ReportService.cs     # Сервіс звітів
+├── Middleware/               # Власні middleware
+│   └── AuthenticationMiddleware.cs
+├── wwwroot/                  # Статичні файли
+│   ├── css/                 # Стилі
+│   ├── js/                  # JavaScript
+│   └── lib/                 # Бібліотеки (Bootstrap, jQuery)
+├── Properties/               # Налаштування запуску
+├── Docs/                     # Документація
+├── PUBLISH-DESKTOP.bat       # Скрипт збірки для продакшн
+├── START-BIZFLOW.bat        # Швидкий старт для розробки
+├── Program.cs               # Точка входу додатку
+└── SETUP.md                 # Повна інструкція з інсталяції
 ```
 
 ---
 
-## 📚 Documentation
+## 🗄️ Структура Бази Даних
 
-- **[SETUP.md](SETUP.md)** - Complete installation, development, and deployment guide
-- **[Docs/MultiUserSystem.md](Docs/MultiUserSystem.md)** - Multi-user database isolation
-- **[Docs/AuthenticationGuide.md](Docs/AuthenticationGuide.md)** - Authentication system details
+### Таблиці:
+- **Users** - Користувачі системи
+- **Categories** - Категорії товарів
+- **Products** - Товари
+- **Operations** - Історія операцій
+
+### Схема зв'язків:
+```
+Users (1) ----< Operations (N)
+Categories (1) ----< Products (N)
+Products (1) ----< Operations (N)
+```
+
+---
+
+## 🎨 Архітектура Додатку
+
+### Патерн: MVC (Model-View-Controller)
+
+```
+┌─────────────┐
+│   Browser   │ ← Клієнт (користувач)
+└──────┬──────┘
+       │ HTTP Request
+       ▼
+┌─────────────────────────────┐
+│     ASP.NET Core MVC        │
+│  ┌──────────────────────┐   │
+│  │   Controllers        │   │ ← Обробка запитів
+│  └──────────┬───────────┘   │
+│             │                │
+│  ┌──────────▼───────────┐   │
+│  │   Services/Logic     │   │ ← Бізнес-логіка
+│  └──────────┬───────────┘   │
+│             │                │
+│  ┌──────────▼───────────┐   │
+│  │   DbContext (EF)     │   │ ← Доступ до даних
+│  └──────────┬───────────┘   │
+└─────────────┼───────────────┘
+              │
+              ▼
+      ┌───────────────┐
+      │  SQLite DB    │ ← База даних
+      └───────────────┘
+```
+
+---
+
+## 📚 Документація
+
+- **[SETUP.md](SETUP.md)** - Повна інструкція з інсталяції, розробки та деплою
+- **[Docs/MultiUserSystem.md](Docs/MultiUserSystem.md)** - Система ізоляції даних користувачів
+- **[Docs/AuthenticationGuide.md](Docs/AuthenticationGuide.md)** - Детальний опис системи аутентифікації
+- **[Docs/TechnicalDetails.md](Docs/TechnicalDetails.md)** - Технічні деталі реалізації
+- **[DEPLOYMENT-CHECKLIST.md](DEPLOYMENT-CHECKLIST.md)** - Чекліст для розгортання
+
+---
+
+## 💻 Розробка
+
+### Запуск проєкту для розробки:
+
+```bash
+# Клонування репозиторію
+git clone https://github.com/Mars007SV/BIZFLOW.Web.git
+cd BIZFLOW.Web
+
+# Встановлення залежностей (автоматично при збірці)
+dotnet restore
+
+# Запуск
+START-BIZFLOW.bat
+# АБО
+dotnet run
+```
+
+### Робота з базою даних:
+
+```bash
+# Створення нової міграції
+dotnet ef migrations add ИмяМиграции
+
+# Застосування міграцій
+dotnet ef database update
+
+# Відкат міграції
+dotnet ef database update ПопередняМиграция
+```
+
+### Збірка для продакшн:
+
+```bash
+# Windows Desktop версія
+PUBLISH-DESKTOP.bat
+
+# Готовий .exe файл буде у папці:
+publish/BIZFLOW-Windows/BIZFLOW.exe
+```
 
 ---
 
 ## 🔄 Git Workflow
 
-### Branches
-- `main` - Stable production releases
-- `develop` - Integration branch for new features
-- `feature/*` - Feature development branches
+### Гілки:
+- `main` - Стабільні продакшн релізи
+- `develop` - Гілка інтеграції нових функцій
+- `feature/*` - Гілки розробки функціоналу
 
-### Contributing
+### Робота з гілками:
 ```bash
+# Створення нової функції
 git checkout develop
-git checkout -b feature/your-feature
-# ... make changes ...
-git commit -m "feat: your feature description"
+git checkout -b feature/назва-функції
+
+# Внесення змін
+git add .
+git commit -m "feat: опис нової функції"
+
+# Злиття з develop
 git checkout develop
-git merge feature/your-feature
+git merge feature/назва-функції
+git push origin develop
+```
+
+### Commit Messages:
+```
+feat: нова функція
+fix: виправлення помилки
+docs: зміни в документації
+style: форматування коду
+refactor: рефакторинг
+test: додавання тестів
+chore: оновлення залежностей
 ```
 
 ---
 
-## 🤝 Support
+## 🧪 Тестування
 
-If you have questions or issues, please create an issue on GitHub:
-https://github.com/Mars007SV/BIZFLOW.Web/issues
+### Функціональне тестування:
+1. Реєстрація нового користувача
+2. Вхід в систему
+3. Додавання категорій
+4. Додавання товарів
+5. Виконання операцій
+6. Перегляд історії
+7. Генерація звітів
+
+### Тестування багатокористувацької роботи:
+- Створіть кілька облікових записів Windows
+- Запустіть BIZFLOW під кожним користувачем
+- Перевірте ізоляцію даних
 
 ---
 
-## 📄 License
+## 🚨 Відомі Обмеження
 
-MIT License - See LICENSE file for details
+- Система призначена для локальної роботи (без мережевого доступу)
+- SQLite база даних не підтримує одночасний доступ з різних процесів
+- Рекомендується регулярне резервне копіювання бази даних
 
 ---
 
-**Made with ❤️ for efficient inventory management**
+## 🔧 Вирішення Проблем
+
+### Проблема: Додаток не запускається
+**Рішення:** 
+- Перевірте, чи встановлено .NET 10 Runtime
+- Перевірте, чи не зайнятий порт 5555
+
+### Проблема: Не створюється база даних
+**Рішення:**
+- Переконайтеся, що у вас є права на запис у `%LOCALAPPDATA%`
+- Запустіть від імені адміністратора
+
+### Проблема: Помилка міграції бази даних
+**Рішення:**
+```bash
+# Видаліть базу даних та створіть заново
+dotnet ef database drop
+dotnet ef database update
+```
+
+---
+
+## 🤝 Внесок у Проєкт
+
+Проєкт відкритий для покращень! Якщо ви знайшли помилку або маєте ідею:
+
+1. Створіть Issue на GitHub
+2. Зробіть Fork репозиторію
+3. Створіть гілку feature
+4. Зробіть Pull Request
+
+**GitHub Issues:** https://github.com/Mars007SV/BIZFLOW.Web/issues
+
+---
+
+## 📜 Ліцензія
+
+MIT License - детальніше у файлі LICENSE
+
+Проєкт розроблено у навчальних цілях як дипломна робота.
+
+---
+
+## 👨‍💻 Автор
+
+**Шибаєв Віталій Сергійович**
+
+🎓 **Дипломний проєкт**  
+📚 **Група:** 6.04.121.010.22.2  
+🔬 **Спеціальність:** 121 - Інженерія програмного забезпечення  
+💻 **GitHub:** [@Mars007SV](https://github.com/Mars007SV)  
+📦 **Repository:** [BIZFLOW.Web](https://github.com/Mars007SV/BIZFLOW.Web)
+
+---
+
+## 🙏 Подяки
+
+- ASP.NET Core Team за чудовий фреймворк
+- Bootstrap Team за прекрасний CSS фреймворк
+- SQLite Team за надійну базу даних
+- Entity Framework Team за потужний ORM
+- Усім розробникам open-source бібліотек
+
+---
+
+**Створено з ❤️ для ефективного управління складом**
+
+---
+
+## 📞 Контакти та Підтримка
+
+Якщо у вас виникли питання щодо проєкту:
+- 📧 Створіть Issue на GitHub
+- 💬 Опишіть проблему детально
+- 🐛 Додайте скріншоти (якщо можливо)
+
+**Час відгуку:** 1-2 робочих дні
+
+---
+
+## 📊 Статистика Проєкту
+
+- 🎯 **Мова:** C# 10
+- 🔧 **Framework:** .NET 10
+- 📁 **Кількість файлів:** 100+
+- 💾 **База даних:** SQLite
+- 🌐 **UI Framework:** Bootstrap 5
+
+---
+
+*Останнє оновлення: Травень 2026*
