@@ -1,3 +1,5 @@
+@model BIZFLOW.Web.Models.ViewModels.CreateSaleViewModel
+
 @{
     ViewData["Title"] = "Створити продаж";
 }
@@ -7,76 +9,97 @@
 <hr />
 
 <div class="row">
-    <div class="col-md-6">
-        <form asp-controller="Operations" asp-action="CreateSale" method="post">
+    <div class="col-md-8">
+        <form asp-action="CreateSale" method="post" id="saleForm">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
             <div class="card mb-3">
                 <div class="card-header">
-                    <h5 class="mb-0">Інформація про продаж</h5>
+                    <h5 class="mb-0">Інформація про клієнта</h5>
                 </div>
                 <div class="card-body">
-                    <!-- Product selection -->
-                    <div class="form-group mb-3">
-                        <label for="ProductId" class="control-label">Товар</label>
-                        <select name="ProductId" id="ProductId" class="form-control" required>
-                            <option value="">-- Виберіть товар --</option>
-                            @foreach (var product in ViewData["Products"] as SelectList)
-                            {
-                                <option value="@product.Value">@product.Text</option>
-                            }
-                        </select>
-                    </div>
-
-                    <!-- Quantity -->
-                    <div class="form-group mb-3">
-                        <label for="Quantity" class="control-label">Кількість</label>
-                        <input type="number" 
-                               name="Quantity" 
-                               id="Quantity" 
-                               class="form-control" 
-                               step="0.001" 
-                               min="0.001" 
-                               value="1" 
-                               required>
-                    </div>
-
                     <!-- Customer name (optional) -->
                     <div class="form-group mb-3">
-                        <label for="CustomerName" class="control-label">Клієнт (необов'язково)</label>
-                        <input type="text" 
-                               name="CustomerName" 
-                               id="CustomerName" 
-                               class="form-control" 
-                               placeholder="Введіть ім'я клієнта...">
+                        <label asp-for="CustomerName" class="control-label">Клієнт (необов'язково)</label>
+                        <input asp-for="CustomerName" class="form-control" placeholder="Введіть ім'я клієнта...">
                     </div>
 
                     <!-- Description -->
                     <div class="form-group mb-3">
-                        <label for="Description" class="control-label">Примітки (необов'язково)</label>
-                        <textarea name="Description" 
-                                  id="Description" 
-                                  class="form-control" 
-                                  rows="2" 
-                                  placeholder="Додаткова інформація..."></textarea>
+                        <label asp-for="Notes" class="control-label">Примітки (необов'язково)</label>
+                        <textarea asp-for="Notes" class="form-control" rows="2" placeholder="Додаткова інформація..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Products section -->
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h5 class="mb-0">Товари</h5>
+                </div>
+                <div class="card-body">
+                    <!-- Add product row -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="productSelect" class="form-label">Виберіть товар</label>
+                            <select id="productSelect" class="form-select">
+                                <option value="">-- Виберіть товар --</option>
+                                @foreach (var product in ViewData["Products"] as SelectList)
+                                {
+                                    <option value="@product.Value">@product.Text</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="quantityInput" class="form-label">Кількість</label>
+                            <input type="number" id="quantityInput" class="form-control" step="0.001" min="0.001" value="1">
+                        </div>
+                        <div class="col-md-3 d-flex align-items-end">
+                            <button type="button" class="btn btn-primary w-100" onclick="addProductToSale()">
+                                <i class="bi bi-plus"></i> Додати
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Selected products table -->
+                    <div id="productsTableContainer" style="display: none;">
+                        <table class="table table-striped" id="productsTable">
+                            <thead>
+                                <tr>
+                                    <th>Товар</th>
+                                    <th>Кількість</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="productsTableBody">
+                                <!-- Products will be added here dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div id="noProductsMessage" class="alert alert-info">
+                        Ще не додано жодного товару. Виберіть товар та натисніть "Додати".
                     </div>
                 </div>
             </div>
 
             <!-- Buttons -->
             <div class="form-group">
-                <button type="submit" class="btn btn-success">
+                <button type="submit" class="btn btn-success" id="submitButton" disabled>
                     <i class="bi bi-check-circle"></i> Створити продаж
                 </button>
-                <a asp-controller="Operations" asp-action="Index" class="btn btn-secondary">
+                <a asp-action="Index" class="btn btn-secondary">
                     <i class="bi bi-arrow-left"></i> Скасувати
                 </a>
             </div>
+
+            <!-- Hidden fields for items will be added here by JavaScript -->
+            <div id="hiddenItemsContainer"></div>
         </form>
     </div>
 
     <!-- Instructions panel -->
-    <div class="col-md-6">
+    <div class="col-md-4">
         <div class="card">
             <div class="card-header bg-info text-white">
                 <h5 class="mb-0">Інструкція</h5>
@@ -85,9 +108,9 @@
                 <ol>
                     <li>Виберіть товар зі списку</li>
                     <li>Вкажіть кількість</li>
-                    <li>За бажанням додайте ім'я клієнта та примітки</li>
+                    <li>Натисніть "Додати"</li>
+                    <li>Повторіть для всіх товарів</li>
                     <li>Натисніть "Створити продаж"</li>
-                    <li>Підтвердіть операцію на наступній сторінці</li>
                 </ol>
                 <hr>
                 <div class="alert alert-info mb-0">
@@ -100,4 +123,135 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    <script>
+        // Store products data from server
+        const productsData = @Html.Raw(ViewData["ProductsJson"]);
+
+        // Array to store selected items
+        let selectedItems = [];
+        let itemCounter = 0;
+
+        // Function to add product to the sale
+        function addProductToSale() {
+            const productId = document.getElementById('productSelect').value;
+            const quantity = parseFloat(document.getElementById('quantityInput').value);
+
+            // Validate selection
+            if (!productId) {
+                alert('Будь ласка, виберіть товар');
+                return;
+            }
+
+            if (!quantity || quantity <= 0) {
+                alert('Будь ласка, введіть коректну кількість');
+                return;
+            }
+
+            // Find product data
+            const product = productsData.find(p => p.id == productId);
+
+            if (!product) {
+                alert('Товар не знайдено');
+                return;
+            }
+
+            // Check if product already in list
+            const existingItem = selectedItems.find(item => item.productId == productId);
+            if (existingItem) {
+                alert('Цей товар вже додано. Ви можете видалити його та додати знову з іншою кількістю.');
+                return;
+            }
+
+            // Check available quantity
+            if (quantity > product.quantity) {
+                alert(`Недостатньо товару на складі. Доступно: ${product.quantity}`);
+                return;
+            }
+
+            // Add item to array
+            const item = {
+                id: itemCounter++,
+                productId: product.id,
+                productName: product.name,
+                quantity: quantity
+            };
+
+            selectedItems.push(item);
+
+            // Update UI
+            updateProductsTable();
+
+            // Reset form
+            document.getElementById('quantityInput').value = '1';
+            document.getElementById('productSelect').value = '';
+        }
+
+        // Function to remove product from sale
+        function removeProduct(itemId) {
+            selectedItems = selectedItems.filter(item => item.id !== itemId);
+            updateProductsTable();
+        }
+
+        // Function to update the products table
+        function updateProductsTable() {
+            const tbody = document.getElementById('productsTableBody');
+            const hiddenContainer = document.getElementById('hiddenItemsContainer');
+            const noProductsMsg = document.getElementById('noProductsMessage');
+            const tableContainer = document.getElementById('productsTableContainer');
+            const submitButton = document.getElementById('submitButton');
+
+            // Clear existing content
+            tbody.innerHTML = '';
+            hiddenContainer.innerHTML = '';
+
+            // Show/hide table and message
+            if (selectedItems.length === 0) {
+                tableContainer.style.display = 'none';
+                noProductsMsg.style.display = 'block';
+                submitButton.disabled = true;
+            } else {
+                tableContainer.style.display = 'block';
+                noProductsMsg.style.display = 'none';
+                submitButton.disabled = false;
+            }
+
+            // Populate table and create hidden fields
+            selectedItems.forEach((item, index) => {
+                // Add table row
+                const row = `
+                    <tr>
+                        <td>${item.productName}</td>
+                        <td>${item.quantity}</td>
+                        <td>
+                            <button type="button" class="btn btn-sm btn-danger" onclick="removeProduct(${item.id})">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+
+                // Add hidden fields for form submission
+                hiddenContainer.innerHTML += `
+                    <input type="hidden" name="Items[${index}].ProductId" value="${item.productId}" />
+                    <input type="hidden" name="Items[${index}].Quantity" value="${item.quantity}" />
+                `;
+            });
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            updateProductsTable();
+        });
+
+        // Allow adding product with Enter key
+        document.getElementById('quantityInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                addProductToSale();
+            }
+        });
+    </script>
 }
+

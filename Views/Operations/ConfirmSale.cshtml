@@ -1,4 +1,4 @@
-@model BIZFLOW.Web.Models.Operation
+@model List<BIZFLOW.Web.Models.Operation>
 
 @{
     ViewData["Title"] = "Підтвердження продажу";
@@ -9,7 +9,7 @@
 <hr />
 
 <div class="row">
-    <div class="col-md-8 offset-md-2">
+    <div class="col-md-10 offset-md-1">
         <div class="card">
             <div class="card-header bg-warning text-dark">
                 <h5 class="mb-0">
@@ -17,70 +17,91 @@
                 </h5>
             </div>
             <div class="card-body">
-                <dl class="row">
-                    <dt class="col-sm-4">Товар:</dt>
-                    <dd class="col-sm-8"><strong>@Model.Product?.Name</strong></dd>
+                @if (!string.IsNullOrEmpty(ViewData["CustomerName"]?.ToString()))
+                {
+                    <div class="mb-3">
+                        <strong>Клієнт:</strong> @ViewData["CustomerName"]
+                    </div>
+                }
 
-                    <dt class="col-sm-4">Категорія:</dt>
-                    <dd class="col-sm-8">@Model.Product?.Category?.Name</dd>
+                @if (!string.IsNullOrEmpty(ViewData["Notes"]?.ToString()))
+                {
+                    <div class="mb-3">
+                        <strong>Примітки:</strong> @ViewData["Notes"]
+                    </div>
+                }
 
-                    <dt class="col-sm-4">Кількість продажу:</dt>
-                    <dd class="col-sm-8">
-                        <strong class="text-danger">@Model.Quantity</strong>
+                <h5 class="mb-3">Товари для продажу:</h5>
+
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>№</th>
+                            <th>Товар</th>
+                            <th>Категорія</th>
+                            <th class="text-end">Кількість продажу</th>
+                            <th class="text-end">Поточний залишок</th>
+                            <th class="text-end">Залишок після</th>
+                        </tr>
+                    </thead>
+                    <tbody>
                         @{
-                            var unitDisplay = Model.Product?.UnitOfMeasure switch
+                            int index = 1;
+                            decimal totalItems = 0;
+                        }
+                        @foreach (var operation in Model)
+                        {
+                            var unitDisplay = operation.Product?.UnitOfMeasure switch
                             {
                                 BIZFLOW.Web.Models.UnitOfMeasure.Kilograms => "кг",
                                 BIZFLOW.Web.Models.UnitOfMeasure.Liters => "л",
                                 _ => "шт"
                             };
+                            totalItems += operation.Quantity;
+
+                            <tr>
+                                <td>@index</td>
+                                <td><strong>@operation.Product?.Name</strong></td>
+                                <td>@operation.Product?.Category?.Name</td>
+                                <td class="text-end">
+                                    <span class="badge bg-danger">@operation.Quantity @unitDisplay</span>
+                                </td>
+                                <td class="text-end">@operation.Product?.Quantity @unitDisplay</td>
+                                <td class="text-end">
+                                    <strong class="text-success">@operation.RemainingQuantity @unitDisplay</strong>
+                                </td>
+                            </tr>
+                            index++;
                         }
-                        @unitDisplay
-                    </dd>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="6" class="text-end">
+                                <strong>Всього позицій:</strong> @Model.Count
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
 
-                    <dt class="col-sm-4">Поточний залишок:</dt>
-                    <dd class="col-sm-8">@Model.Product?.Quantity @unitDisplay</dd>
+                <dl class="row mt-3">
+                    <dt class="col-sm-3">Дата операції:</dt>
+                    <dd class="col-sm-9">@Model.First().Date.ToString("dd.MM.yyyy HH:mm")</dd>
 
-                    <dt class="col-sm-4">Залишок після продажу:</dt>
-                    <dd class="col-sm-8">
-                        <strong class="text-success">@(Model.Product!.Quantity - Model.Quantity)</strong> @unitDisplay
-                    </dd>
-
-                    @if (!string.IsNullOrEmpty(ViewData["CustomerName"]?.ToString()))
-                    {
-                        <dt class="col-sm-4">Клієнт:</dt>
-                        <dd class="col-sm-8">@ViewData["CustomerName"]</dd>
-                    }
-
-                    @if (!string.IsNullOrEmpty(Model.Description))
-                    {
-                        <dt class="col-sm-4">Примітки:</dt>
-                        <dd class="col-sm-8">@Model.Description</dd>
-                    }
-
-                    <dt class="col-sm-4">Дата операції:</dt>
-                    <dd class="col-sm-8">@Model.Date.ToString("dd.MM.yyyy HH:mm")</dd>
-
-                    <dt class="col-sm-4">Користувач:</dt>
-                    <dd class="col-sm-8">@Model.UserName</dd>
+                    <dt class="col-sm-3">Користувач:</dt>
+                    <dd class="col-sm-9">@Model.First().UserName</dd>
                 </dl>
 
                 <hr />
 
                 <div class="alert alert-warning" role="alert">
                     <i class="bi bi-exclamation-triangle"></i>
-                    <strong>Увага!</strong> Після підтвердження кількість товару буде зменшено.
+                    <strong>Увага!</strong> Після підтвердження кількість товарів буде зменшено для всіх позицій.
                 </div>
 
                 <form asp-action="ConfirmSale" method="post">
-                    <input type="hidden" name="ProductId" value="@Model.ProductId" />
-                    <input type="hidden" name="Quantity" value="@Model.Quantity" />
-                    <input type="hidden" name="Description" value="@Model.Description" />
-                    <input type="hidden" name="CustomerName" value="@ViewData["CustomerName"]" />
-
                     <div class="d-flex gap-2">
-                        <button type="submit" class="btn btn-success">
-                            <i class="bi bi-check-circle"></i> Підтвердити продаж
+                        <button type="submit" class="btn btn-success btn-lg">
+                            <i class="bi bi-check-circle"></i> Підтвердити продаж (@Model.Count поз.)
                         </button>
                         <a asp-action="CreateSale" class="btn btn-secondary">
                             <i class="bi bi-arrow-left"></i> Повернутися назад
@@ -94,3 +115,4 @@
         </div>
     </div>
 </div>
+
