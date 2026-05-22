@@ -281,6 +281,128 @@ namespace BIZFLOW.Web.Controllers
             return View(operations);
         }
 
+        // GET: Operations/CreateSale
+        // Show form to create a new sale
+        public IActionResult CreateSale()
+        {
+            // Get products for dropdown
+            var products = _context.Products
+                .Include(p => p.Category)
+                .OrderBy(p => p.Name)
+                .ToList();
+
+            ViewData["Products"] = new SelectList(products, "Id", "Name");
+            return View();
+        }
+
+        // POST: Operations/CreateSale
+        // Process sale form and show confirmation page
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateSale(int ProductId, decimal Quantity, string? CustomerName, string? Description)
+        {
+            // Validate product exists
+            var product = await _context.Products
+                .Include(p => p.Category)
+                .FirstOrDefaultAsync(p => p.Id == ProductId);
+
+            if (product == null)
+            {
+                TempData["ErrorMessage"] = "Товар не знайдено";
+                return RedirectToAction(nameof(CreateSale));
+            }
+
+            // Validate quantity
+            if (Quantity <= 0)
+            {
+                TempData["ErrorMessage"] = "Кількість повинна бути більше нуля";
+                return RedirectToAction(nameof(CreateSale));
+            }
+
+            // Check if enough quantity available
+            if (product.Quantity < Quantity)
+            {
+                TempData["ErrorMessage"] = $"Недостатньо товару на складі. Доступно: {product.Quantity}";
+                return RedirectToAction(nameof(CreateSale));
+            }
+
+            // Build description with customer name if provided
+            string finalDescription = Description ?? "Продаж товару";
+            if (!string.IsNullOrEmpty(CustomerName))
+            {
+                finalDescription = $"Продаж клієнту: {CustomerName}. {finalDescription}";
+            }
+
+            // Create operation object for confirmation (not saved yet)
+            var operation = new Operation
+            {
+                ProductId = ProductId,
+                Product = product,
+                Quantity = Quantity,
+                Type = "Outgoing",
+                Date = DateTime.Now,
+                Description = finalDescription,
+                UserName = HttpContext.Session.GetString("UserName") ?? "Система"
+            };
+
+            // Store customer name in ViewData for confirmation page
+            ViewData["CustomerName"] = CustomerName;
+
+            // Show confirmation page
+            return View("ConfirmSale", operation);
+        }
+
+        // POST: Operations/ConfirmSale
+        // Confirm and save the sale operation
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ConfirmSale(int ProductId, decimal Quantity, string? Description, string? CustomerName)
+        {
+            // Find the product again
+            var product = await _context.Products.FindAsync(ProductId);
+
+            if (product == null)
+            {
+                TempData["ErrorMessage"] = "Товар не знайдено";
+                return RedirectToAction(nameof(CreateSale));
+            }
+
+            // Double-check quantity is still available
+            if (product.Quantity < Quantity)
+            {
+                TempData["ErrorMessage"] = $"Недостатньо товару на складі. Доступно: {product.Quantity}";
+                return RedirectToAction(nameof(CreateSale));
+            }
+
+            // Decrease product quantity
+            product.Quantity -= Quantity;
+
+            // Create and save operation
+            var operation = new Operation
+            {
+                ProductId = ProductId,
+                Quantity = Quantity,
+                Type = "Outgoing",
+                Date = DateTime.Now,
+                Description = Description ?? "Продаж товару",
+                UserName = HttpContext.Session.GetString("UserName") ?? "Система",
+                RemainingQuantity = product.Quantity
+            };
+
+            _context.Operations.Add(operation);
+            await _context.SaveChangesAsync();
+
+            var unitDisplay = product.UnitOfMeasure switch
+            {
+                UnitOfMeasure.Kilograms => "кг",
+                UnitOfMeasure.Liters => "л",
+                _ => "шт"
+            };
+
+            TempData["SuccessMessage"] = $"Продаж успішно створено! {product.Name} - {Quantity} {unitDisplay}. Залишок: {product.Quantity} {unitDisplay}";
+            return RedirectToAction(nameof(Index));
+        }
+
         // GET: Operations/ExportToExcel
         public async Task<IActionResult> ExportToExcel()
         {

@@ -24,11 +24,6 @@ namespace BIZFLOW.Web.Models
         [Display(Name = "Unit of Measure")]
         public UnitOfMeasure UnitOfMeasure { get; set; } = UnitOfMeasure.Pieces;
 
-        // Price per unit for selling
-        [Display(Name = "Price")]
-        [Range(0, double.MaxValue, ErrorMessage = "Price must be greater than or equal to 0")]
-        public decimal Price { get; set; }
-
         // Foreign key linking to category
         [Required]
         [Display(Name = "Category")]

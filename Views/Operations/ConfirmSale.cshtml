@@ -1,0 +1,96 @@
+@model BIZFLOW.Web.Models.Operation
+
+@{
+    ViewData["Title"] = "Підтвердження продажу";
+}
+
+<h1>Підтвердження продажу</h1>
+
+<hr />
+
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="card">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0">
+                    <i class="bi bi-exclamation-triangle"></i> Перевірте дані перед підтвердженням
+                </h5>
+            </div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-4">Товар:</dt>
+                    <dd class="col-sm-8"><strong>@Model.Product?.Name</strong></dd>
+
+                    <dt class="col-sm-4">Категорія:</dt>
+                    <dd class="col-sm-8">@Model.Product?.Category?.Name</dd>
+
+                    <dt class="col-sm-4">Кількість продажу:</dt>
+                    <dd class="col-sm-8">
+                        <strong class="text-danger">@Model.Quantity</strong>
+                        @{
+                            var unitDisplay = Model.Product?.UnitOfMeasure switch
+                            {
+                                BIZFLOW.Web.Models.UnitOfMeasure.Kilograms => "кг",
+                                BIZFLOW.Web.Models.UnitOfMeasure.Liters => "л",
+                                _ => "шт"
+                            };
+                        }
+                        @unitDisplay
+                    </dd>
+
+                    <dt class="col-sm-4">Поточний залишок:</dt>
+                    <dd class="col-sm-8">@Model.Product?.Quantity @unitDisplay</dd>
+
+                    <dt class="col-sm-4">Залишок після продажу:</dt>
+                    <dd class="col-sm-8">
+                        <strong class="text-success">@(Model.Product!.Quantity - Model.Quantity)</strong> @unitDisplay
+                    </dd>
+
+                    @if (!string.IsNullOrEmpty(ViewData["CustomerName"]?.ToString()))
+                    {
+                        <dt class="col-sm-4">Клієнт:</dt>
+                        <dd class="col-sm-8">@ViewData["CustomerName"]</dd>
+                    }
+
+                    @if (!string.IsNullOrEmpty(Model.Description))
+                    {
+                        <dt class="col-sm-4">Примітки:</dt>
+                        <dd class="col-sm-8">@Model.Description</dd>
+                    }
+
+                    <dt class="col-sm-4">Дата операції:</dt>
+                    <dd class="col-sm-8">@Model.Date.ToString("dd.MM.yyyy HH:mm")</dd>
+
+                    <dt class="col-sm-4">Користувач:</dt>
+                    <dd class="col-sm-8">@Model.UserName</dd>
+                </dl>
+
+                <hr />
+
+                <div class="alert alert-warning" role="alert">
+                    <i class="bi bi-exclamation-triangle"></i>
+                    <strong>Увага!</strong> Після підтвердження кількість товару буде зменшено.
+                </div>
+
+                <form asp-action="ConfirmSale" method="post">
+                    <input type="hidden" name="ProductId" value="@Model.ProductId" />
+                    <input type="hidden" name="Quantity" value="@Model.Quantity" />
+                    <input type="hidden" name="Description" value="@Model.Description" />
+                    <input type="hidden" name="CustomerName" value="@ViewData["CustomerName"]" />
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-check-circle"></i> Підтвердити продаж
+                        </button>
+                        <a asp-action="CreateSale" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Повернутися назад
+                        </a>
+                        <a asp-action="Index" class="btn btn-outline-secondary">
+                            <i class="bi bi-x-circle"></i> Скасувати
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

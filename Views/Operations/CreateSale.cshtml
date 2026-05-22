@@ -1,0 +1,103 @@
+@{
+    ViewData["Title"] = "Створити продаж";
+}
+
+<h1>Створити продаж</h1>
+
+<hr />
+
+<div class="row">
+    <div class="col-md-6">
+        <form asp-controller="Operations" asp-action="CreateSale" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h5 class="mb-0">Інформація про продаж</h5>
+                </div>
+                <div class="card-body">
+                    <!-- Product selection -->
+                    <div class="form-group mb-3">
+                        <label for="ProductId" class="control-label">Товар</label>
+                        <select name="ProductId" id="ProductId" class="form-control" required>
+                            <option value="">-- Виберіть товар --</option>
+                            @foreach (var product in ViewData["Products"] as SelectList)
+                            {
+                                <option value="@product.Value">@product.Text</option>
+                            }
+                        </select>
+                    </div>
+
+                    <!-- Quantity -->
+                    <div class="form-group mb-3">
+                        <label for="Quantity" class="control-label">Кількість</label>
+                        <input type="number" 
+                               name="Quantity" 
+                               id="Quantity" 
+                               class="form-control" 
+                               step="0.001" 
+                               min="0.001" 
+                               value="1" 
+                               required>
+                    </div>
+
+                    <!-- Customer name (optional) -->
+                    <div class="form-group mb-3">
+                        <label for="CustomerName" class="control-label">Клієнт (необов'язково)</label>
+                        <input type="text" 
+                               name="CustomerName" 
+                               id="CustomerName" 
+                               class="form-control" 
+                               placeholder="Введіть ім'я клієнта...">
+                    </div>
+
+                    <!-- Description -->
+                    <div class="form-group mb-3">
+                        <label for="Description" class="control-label">Примітки (необов'язково)</label>
+                        <textarea name="Description" 
+                                  id="Description" 
+                                  class="form-control" 
+                                  rows="2" 
+                                  placeholder="Додаткова інформація..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Buttons -->
+            <div class="form-group">
+                <button type="submit" class="btn btn-success">
+                    <i class="bi bi-check-circle"></i> Створити продаж
+                </button>
+                <a asp-controller="Operations" asp-action="Index" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Скасувати
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Instructions panel -->
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">Інструкція</h5>
+            </div>
+            <div class="card-body">
+                <ol>
+                    <li>Виберіть товар зі списку</li>
+                    <li>Вкажіть кількість</li>
+                    <li>За бажанням додайте ім'я клієнта та примітки</li>
+                    <li>Натисніть "Створити продаж"</li>
+                    <li>Підтвердіть операцію на наступній сторінці</li>
+                </ol>
+                <hr>
+                <div class="alert alert-info mb-0">
+                    <i class="bi bi-info-circle"></i> Після створення ви побачите підтвердження перед збереженням
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
