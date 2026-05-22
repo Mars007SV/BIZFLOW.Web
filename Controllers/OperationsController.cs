@@ -113,8 +113,8 @@ namespace BIZFLOW.Web.Controllers
                     operation.Date = DateTime.Now;
                 }
 
-                // Set current user (if you have authentication, use User.Identity.Name)
-                operation.UserName = User?.Identity?.Name ?? "Система";
+                // Set current user (get from session)
+                operation.UserName = HttpContext.Session.GetString("UserName") ?? "Система";
 
                 // find the product
                 var product = await _context.Products.FindAsync(operation.ProductId);
