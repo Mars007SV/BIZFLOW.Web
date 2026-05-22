@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using BIZFLOW.Web.Data;
 using BIZFLOW.Web.Models;
+using BIZFLOW.Web.Models.ViewModels;
 using BIZFLOW.Web.Services;
 
 namespace BIZFLOW.Web.Controllers
@@ -113,8 +114,8 @@ namespace BIZFLOW.Web.Controllers
                     operation.Date = DateTime.Now;
                 }
 
-                // Set current user (if you have authentication, use User.Identity.Name)
-                operation.UserName = User?.Identity?.Name ?? "Система";
+                // Set current user (get from session)
+                operation.UserName = HttpContext.Session.GetString("UserName") ?? "Система";
 
                 // find the product
                 var product = await _context.Products.FindAsync(operation.ProductId);
@@ -279,6 +280,208 @@ namespace BIZFLOW.Web.Controllers
                 .ToListAsync();
 
             return View(operations);
+        }
+
+        // GET: Operations/CreateSale
+        // Show form to create a new sale
+        public IActionResult CreateSale()
+        {
+            // Get products for dropdown
+            var products = _context.Products
+                .Include(p => p.Category)
+                .OrderBy(p => p.Name)
+                .ToList();
+
+            ViewData["Products"] = new SelectList(products, "Id", "Name");
+
+            // Pass products as JSON for client-side processing
+            ViewData["ProductsJson"] = System.Text.Json.JsonSerializer.Serialize(
+                products.Select(p => new 
+                { 
+                    id = p.Id, 
+                    name = p.Name, 
+                    quantity = p.Quantity
+                })
+            );
+
+            return View(new CreateSaleViewModel());
+        }
+
+        // POST: Operations/CreateSale
+        // Process sale form with multiple items and show confirmation page
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateSale(CreateSaleViewModel model)
+        {
+            // Check if at least one item is in the sale
+            if (model.Items == null || !model.Items.Any())
+            {
+                TempData["ErrorMessage"] = "Будь ласка, додайте хоча б один товар";
+                return RedirectToAction(nameof(CreateSale));
+            }
+
+            // List to store operations for confirmation
+            var operations = new List<Operation>();
+
+            // Validate each item and check product availability
+            foreach (var item in model.Items)
+            {
+                var product = await _context.Products
+                    .Include(p => p.Category)
+                    .FirstOrDefaultAsync(p => p.Id == item.ProductId);
+
+                if (product == null)
+                {
+                    TempData["ErrorMessage"] = $"Товар з ID {item.ProductId} не знайдено";
+                    return RedirectToAction(nameof(CreateSale));
+                }
+
+                // Validate quantity
+                if (item.Quantity <= 0)
+                {
+                    TempData["ErrorMessage"] = $"Кількість для товару '{product.Name}' повинна бути більше нуля";
+                    return RedirectToAction(nameof(CreateSale));
+                }
+
+                // Check if enough quantity available
+                if (product.Quantity < item.Quantity)
+                {
+                    TempData["ErrorMessage"] = $"Недостатньо товару '{product.Name}'. Доступно: {product.Quantity}";
+                    return RedirectToAction(nameof(CreateSale));
+                }
+
+                // Build description with customer name if provided
+                string description = model.Notes ?? "Продаж товару";
+                if (!string.IsNullOrEmpty(model.CustomerName))
+                {
+                    description = $"Продаж клієнту: {model.CustomerName}. {description}";
+                }
+
+                // Create operation object for confirmation (not saved yet)
+                var operation = new Operation
+                {
+                    ProductId = item.ProductId,
+                    Product = product,
+                    Quantity = item.Quantity,
+                    Type = "Outgoing",
+                    Date = DateTime.Now,
+                    Description = description,
+                    UserName = HttpContext.Session.GetString("UserName") ?? "Система",
+                    RemainingQuantity = product.Quantity - item.Quantity
+                };
+
+                operations.Add(operation);
+            }
+
+            // Store data in TempData for confirmation page
+            TempData["ConfirmationData"] = System.Text.Json.JsonSerializer.Serialize(new
+            {
+                CustomerName = model.CustomerName,
+                Notes = model.Notes,
+                Items = model.Items.Select(i => new { i.ProductId, i.Quantity }).ToList()
+            });
+
+            // Show confirmation page with all operations
+            ViewData["CustomerName"] = model.CustomerName;
+            ViewData["Notes"] = model.Notes;
+            return View("ConfirmSale", operations);
+        }
+
+        // POST: Operations/ConfirmSale
+        // Confirm and save multiple sale operations
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ConfirmSale()
+        {
+            // Retrieve confirmation data from TempData
+            var confirmationDataJson = TempData["ConfirmationData"]?.ToString();
+            if (string.IsNullOrEmpty(confirmationDataJson))
+            {
+                TempData["ErrorMessage"] = "Дані підтвердження не знайдено";
+                return RedirectToAction(nameof(CreateSale));
+            }
+
+            var confirmationData = System.Text.Json.JsonSerializer.Deserialize<ConfirmationData>(confirmationDataJson);
+
+            if (confirmationData?.Items == null || !confirmationData.Items.Any())
+            {
+                TempData["ErrorMessage"] = "Немає товарів для продажу";
+                return RedirectToAction(nameof(CreateSale));
+            }
+
+            var savedOperations = new List<string>();
+
+            // Process each item
+            foreach (var item in confirmationData.Items)
+            {
+                var product = await _context.Products.FindAsync(item.ProductId);
+
+                if (product == null)
+                {
+                    TempData["ErrorMessage"] = $"Товар з ID {item.ProductId} не знайдено";
+                    return RedirectToAction(nameof(CreateSale));
+                }
+
+                // Double-check quantity is still available
+                if (product.Quantity < item.Quantity)
+                {
+                    TempData["ErrorMessage"] = $"Недостатньо товару '{product.Name}'. Доступно: {product.Quantity}";
+                    return RedirectToAction(nameof(CreateSale));
+                }
+
+                // Build description
+                string description = confirmationData.Notes ?? "Продаж товару";
+                if (!string.IsNullOrEmpty(confirmationData.CustomerName))
+                {
+                    description = $"Продаж клієнту: {confirmationData.CustomerName}. {description}";
+                }
+
+                // Decrease product quantity
+                product.Quantity -= item.Quantity;
+
+                // Create and save operation
+                var operation = new Operation
+                {
+                    ProductId = item.ProductId,
+                    Quantity = item.Quantity,
+                    Type = "Outgoing",
+                    Date = DateTime.Now,
+                    Description = description,
+                    UserName = HttpContext.Session.GetString("UserName") ?? "Система",
+                    RemainingQuantity = product.Quantity
+                };
+
+                _context.Operations.Add(operation);
+
+                var unitDisplay = product.UnitOfMeasure switch
+                {
+                    UnitOfMeasure.Kilograms => "кг",
+                    UnitOfMeasure.Liters => "л",
+                    _ => "шт"
+                };
+
+                savedOperations.Add($"{product.Name} - {item.Quantity} {unitDisplay}");
+            }
+
+            // Save all changes
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = $"Продаж успішно створено! Продано товарів: {savedOperations.Count}. {string.Join(", ", savedOperations)}";
+            return RedirectToAction(nameof(Index));
+        }
+
+        // Helper class for deserialization
+        private class ConfirmationData
+        {
+            public string? CustomerName { get; set; }
+            public string? Notes { get; set; }
+            public List<ConfirmationItem> Items { get; set; } = new();
+        }
+
+        private class ConfirmationItem
+        {
+            public int ProductId { get; set; }
+            public decimal Quantity { get; set; }
         }
 
         // GET: Operations/ExportToExcel

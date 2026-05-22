@@ -13,10 +13,10 @@ namespace BIZFLOW.Web.Data
         }
 
         // Database tables
-        public DbSet<Product> Products { get; set; }
-        public DbSet<Category> Categories { get; set; }
-        public DbSet<Operation> Operations { get; set; }
-        public DbSet<User> Users { get; set; }
+        public DbSet<Product> Products { get; set; } // Represents the Products table
+        public DbSet<Category> Categories { get; set; } // Represents the Categories table
+        public DbSet<Operation> Operations { get; set; } // Represents the Operations table
+        public DbSet<User> Users { get; set; } // Represents the Users table
 
         // Configure database model and relationships
         protected override void OnModelCreating(ModelBuilder modelBuilder)
