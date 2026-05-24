@@ -11,7 +11,7 @@ namespace BIZFLOW.Web.Models
 
         // Category name (required)
         [Required]
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
 
         // Collection of products in this category
         public List<Product>? Products { get; set; }
