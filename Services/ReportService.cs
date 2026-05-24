@@ -13,7 +13,7 @@ namespace BIZFLOW.Web.Services
 {
     public interface IReportService
     {
-        Task<ReportViewModel> GenerateReportDataAsync(string userName);
+        Task<ReportViewModel> GenerateReportDataAsync(string userName, int userId);
         byte[] GenerateExcelReport(ReportViewModel data);
         byte[] GenerateCsvReport(ReportViewModel data);
     }
@@ -27,7 +27,7 @@ namespace BIZFLOW.Web.Services
             _context = context;
         }
 
-        public async Task<ReportViewModel> GenerateReportDataAsync(string userName)
+        public async Task<ReportViewModel> GenerateReportDataAsync(string userName, int userId)
         {
             var report = new ReportViewModel
             {
@@ -35,14 +35,16 @@ namespace BIZFLOW.Web.Services
                 GeneratedBy = userName
             };
 
-            // Отримуємо всі дані
+            // Get data filtered by userId
             var products = await _context.Products
                 .Include(p => p.Category)
+                .Where(p => p.UserId == userId)
                 .ToListAsync();
 
             var operations = await _context.Operations
                 .Include(o => o.Product)
                     .ThenInclude(p => p!.Category)
+                .Where(o => o.UserId == userId)
                 .OrderByDescending(o => o.Date)
                 .ToListAsync();
 

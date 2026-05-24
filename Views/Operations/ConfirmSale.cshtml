@@ -1,0 +1,118 @@
+@model List<BIZFLOW.Web.Models.Operation>
+
+@{
+    ViewData["Title"] = "Підтвердження продажу";
+}
+
+<h1>Підтвердження продажу</h1>
+
+<hr />
+
+<div class="row">
+    <div class="col-md-10 offset-md-1">
+        <div class="card">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0">
+                    <i class="bi bi-exclamation-triangle"></i> Перевірте дані перед підтвердженням
+                </h5>
+            </div>
+            <div class="card-body">
+                @if (!string.IsNullOrEmpty(ViewData["CustomerName"]?.ToString()))
+                {
+                    <div class="mb-3">
+                        <strong>Клієнт:</strong> @ViewData["CustomerName"]
+                    </div>
+                }
+
+                @if (!string.IsNullOrEmpty(ViewData["Notes"]?.ToString()))
+                {
+                    <div class="mb-3">
+                        <strong>Примітки:</strong> @ViewData["Notes"]
+                    </div>
+                }
+
+                <h5 class="mb-3">Товари для продажу:</h5>
+
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>№</th>
+                            <th>Товар</th>
+                            <th>Категорія</th>
+                            <th class="text-end">Кількість продажу</th>
+                            <th class="text-end">Поточний залишок</th>
+                            <th class="text-end">Залишок після</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            int index = 1;
+                            decimal totalItems = 0;
+                        }
+                        @foreach (var operation in Model)
+                        {
+                            var unitDisplay = operation.Product?.UnitOfMeasure switch
+                            {
+                                BIZFLOW.Web.Models.UnitOfMeasure.Kilograms => "кг",
+                                BIZFLOW.Web.Models.UnitOfMeasure.Liters => "л",
+                                _ => "шт"
+                            };
+                            totalItems += operation.Quantity;
+
+                            <tr>
+                                <td>@index</td>
+                                <td><strong>@operation.Product?.Name</strong></td>
+                                <td>@operation.Product?.Category?.Name</td>
+                                <td class="text-end">
+                                    <span class="badge bg-danger">@operation.Quantity @unitDisplay</span>
+                                </td>
+                                <td class="text-end">@operation.Product?.Quantity @unitDisplay</td>
+                                <td class="text-end">
+                                    <strong class="text-success">@operation.RemainingQuantity @unitDisplay</strong>
+                                </td>
+                            </tr>
+                            index++;
+                        }
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="6" class="text-end">
+                                <strong>Всього позицій:</strong> @Model.Count
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+
+                <dl class="row mt-3">
+                    <dt class="col-sm-3">Дата операції:</dt>
+                    <dd class="col-sm-9">@Model.First().Date.ToString("dd.MM.yyyy HH:mm")</dd>
+
+                    <dt class="col-sm-3">Користувач:</dt>
+                    <dd class="col-sm-9">@Model.First().UserName</dd>
+                </dl>
+
+                <hr />
+
+                <div class="alert alert-warning" role="alert">
+                    <i class="bi bi-exclamation-triangle"></i>
+                    <strong>Увага!</strong> Після підтвердження кількість товарів буде зменшено для всіх позицій.
+                </div>
+
+                <form asp-action="ConfirmSale" method="post">
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-success btn-lg">
+                            <i class="bi bi-check-circle"></i> Підтвердити продаж (@Model.Count поз.)
+                        </button>
+                        <a asp-action="CreateSale" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Повернутися назад
+                        </a>
+                        <a asp-action="Index" class="btn btn-outline-secondary">
+                            <i class="bi bi-x-circle"></i> Скасувати
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+

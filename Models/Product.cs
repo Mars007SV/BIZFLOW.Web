@@ -31,5 +31,13 @@ namespace BIZFLOW.Web.Models
 
         // Navigation property to access related category
         public Category? Category { get; set; }
+
+        // Foreign key linking to user (owner of this product)
+        [Required]
+        [Display(Name = "User")]
+        public int UserId { get; set; }
+
+        // Navigation property to access related user
+        public User? User { get; set; }
     }
 }
