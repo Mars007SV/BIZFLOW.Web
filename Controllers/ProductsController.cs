@@ -21,12 +21,32 @@ namespace BIZFLOW.Web.Controllers
             _context = context;
         }
 
+        // Helper method to get current user ID from session
+        private int? GetCurrentUserId()
+        {
+            var userIdString = HttpContext.Session.GetString("UserId");
+            if (int.TryParse(userIdString, out int userId))
+            {
+                return userId;
+            }
+            return null;
+        }
+
         // GET: Products
         // Display list of products with search and filter functionality
         public async Task<IActionResult> Index(string searchString, int? categoryFilter)
         {
-            // Get all products with their categories
-            var products = _context.Products.Include(p => p.Category).AsQueryable();
+            var currentUserId = GetCurrentUserId();
+            if (currentUserId == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            // Get products filtered by current user
+            var products = _context.Products
+                .Include(p => p.Category)
+                .Where(p => p.UserId == currentUserId.Value)
+                .AsQueryable();
 
             // Search by product name
             if (!string.IsNullOrEmpty(searchString))
@@ -57,9 +77,16 @@ namespace BIZFLOW.Web.Controllers
                 return NotFound();
             }
 
+            var currentUserId = GetCurrentUserId();
+            if (currentUserId == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
             var product = await _context.Products
                 .Include(p => p.Category)
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .FirstOrDefaultAsync(m => m.Id == id && m.UserId == currentUserId.Value);
+
             if (product == null)
             {
                 return NotFound();
@@ -72,6 +99,12 @@ namespace BIZFLOW.Web.Controllers
         // Display form for creating new product
         public IActionResult Create()
         {
+            var currentUserId = GetCurrentUserId();
+            if (currentUserId == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
             // Populate category dropdown list
             ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name");
             return View();
@@ -83,6 +116,18 @@ namespace BIZFLOW.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Name,Quantity,UnitOfMeasure,CategoryId")] Product product)
         {
+            var currentUserId = GetCurrentUserId();
+            if (currentUserId == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            // Set the UserId for the new product
+            product.UserId = currentUserId.Value;
+
+            // Remove UserId from ModelState validation since we set it manually
+            ModelState.Remove("UserId");
+
             if (ModelState.IsValid)
             {
                 // Add product to database
@@ -104,11 +149,20 @@ namespace BIZFLOW.Web.Controllers
                 return NotFound();
             }
 
-            var product = await _context.Products.FindAsync(id);
+            var currentUserId = GetCurrentUserId();
+            if (currentUserId == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            var product = await _context.Products
+                .FirstOrDefaultAsync(p => p.Id == id && p.UserId == currentUserId.Value);
+
             if (product == null)
             {
                 return NotFound();
             }
+
             ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name", product.CategoryId);
             return View(product);
         }
@@ -124,6 +178,28 @@ namespace BIZFLOW.Web.Controllers
             {
                 return NotFound();
             }
+
+            var currentUserId = GetCurrentUserId();
+            if (currentUserId == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            // Verify the product belongs to the current user
+            var existingProduct = await _context.Products
+                .AsNoTracking()
+                .FirstOrDefaultAsync(p => p.Id == id && p.UserId == currentUserId.Value);
+
+            if (existingProduct == null)
+            {
+                return NotFound();
+            }
+
+            // Preserve the UserId
+            product.UserId = currentUserId.Value;
+
+            // Remove UserId from ModelState validation
+            ModelState.Remove("UserId");
 
             if (ModelState.IsValid)
             {
@@ -157,9 +233,16 @@ namespace BIZFLOW.Web.Controllers
                 return NotFound();
             }
 
+            var currentUserId = GetCurrentUserId();
+            if (currentUserId == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
             var product = await _context.Products
                 .Include(p => p.Category)
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .FirstOrDefaultAsync(m => m.Id == id && m.UserId == currentUserId.Value);
+
             if (product == null)
             {
                 return NotFound();
@@ -173,13 +256,21 @@ namespace BIZFLOW.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var product = await _context.Products.FindAsync(id);
+            var currentUserId = GetCurrentUserId();
+            if (currentUserId == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            var product = await _context.Products
+                .FirstOrDefaultAsync(p => p.Id == id && p.UserId == currentUserId.Value);
+
             if (product != null)
             {
                 _context.Products.Remove(product);
+                await _context.SaveChangesAsync();
             }
 
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 

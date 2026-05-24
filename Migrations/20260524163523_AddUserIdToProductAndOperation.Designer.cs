@@ -3,6 +3,7 @@ using System;
 using BIZFLOW.Web.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BIZFLOW.Web.Migrations
 {
     [DbContext(typeof(BizFlowDbContext))]
-    partial class BizFlowDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260524163523_AddUserIdToProductAndOperation")]
+    partial class AddUserIdToProductAndOperation
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.7");

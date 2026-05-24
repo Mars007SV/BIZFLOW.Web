@@ -38,7 +38,7 @@ namespace BIZFLOW.Web.Models
         [StringLength(500, ErrorMessage = "Description cannot exceed 500 characters")]
         public string? Description { get; set; }
 
-        // User who performed the operation
+        // User who performed the operation (display name)
         [Display(Name = "User")]
         [StringLength(100)]
         public string? UserName { get; set; }
@@ -46,5 +46,13 @@ namespace BIZFLOW.Web.Models
         // Product quantity remaining after this operation
         [Display(Name = "Remaining Quantity")]
         public decimal RemainingQuantity { get; set; }
+
+        // Foreign key linking to user (owner of this operation)
+        [Required]
+        [Display(Name = "User")]
+        public int UserId { get; set; }
+
+        // Navigation property to access related user
+        public User? User { get; set; }
     }
 }
