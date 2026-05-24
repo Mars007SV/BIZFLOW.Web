@@ -1,8 +1,7 @@
 using BIZFLOW.Web.Data;
 using BIZFLOW.Web.Models;
 using Microsoft.EntityFrameworkCore;
-using System.Security.Cryptography;
-using System.Text;
+using BCrypt.Net;
 
 namespace BIZFLOW.Web.Services
 {
@@ -97,19 +96,23 @@ namespace BIZFLOW.Web.Services
             await Task.CompletedTask;
         }
 
-        // Hash password using SHA256 for secure storage
+        // Hash password using BCrypt for secure storage
         public string HashPassword(string password)
         {
-            using var sha256 = SHA256.Create();
-            var hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
-            return Convert.ToBase64String(hashedBytes);
+            return BCrypt.Net.BCrypt.HashPassword(password, workFactor: 12);
         }
 
         // Verify password matches stored hash
         public bool VerifyPassword(string password, string hash)
         {
-            var passwordHash = HashPassword(password);
-            return passwordHash == hash;
+            try
+            {
+                return BCrypt.Net.BCrypt.Verify(password, hash);
+            }
+            catch
+            {
+                return false;
+            }
         }
     }
 }

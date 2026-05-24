@@ -30,7 +30,7 @@ BizFlowDbContext  <-- Database (SQLite)
   - RegisterAsync() - register new user
   - GetCurrentUserAsync() - get current user from session
   - LogoutAsync() - logout
-  - HashPassword() - password hashing (SHA256)
+  - HashPassword() - password hashing (BCrypt)
   - VerifyPassword() - password verification
 
 ### 3. Middleware
@@ -134,11 +134,27 @@ Session data:
 ```csharp
 public string HashPassword(string password)
 {
-    using var sha256 = SHA256.Create();
-    var hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
-    return Convert.ToBase64String(hashedBytes);
+    return BCrypt.Net.BCrypt.HashPassword(password, workFactor: 12);
+}
+
+public bool VerifyPassword(string password, string hash)
+{
+    try
+    {
+        return BCrypt.Net.BCrypt.Verify(password, hash);
+    }
+    catch
+    {
+        return false;
+    }
 }
 ```
+
+BCrypt advantages:
+- Adaptive hashing (configurable work factor)
+- Built-in salt generation
+- Resistant to rainbow table attacks
+- Industry standard for password storage
 
 ### Validation
 - UserName: 3-50 characters
